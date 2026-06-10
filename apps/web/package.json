@@ -1,0 +1,15 @@
+{
+  "name": "@e-onux/trellis-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Trellis landing + wizard. Static site that reuses @e-onux/trellis-core's compose engine to generate a tailored AI spec, an npx command, or a .zip starter.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "node build.mjs",
+    "serve": "node build.mjs && node -e \"import('node:http').then(({createServer})=>{import('node:fs').then(fs=>{import('node:path').then(path=>{const root='dist';createServer((q,s)=>{let p=path.join(root,decodeURIComponent(q.url.split('?')[0]));if(q.url==='/')p=path.join(root,'index.html');try{const b=fs.readFileSync(p);const ext=path.extname(p);const ct={'.html':'text/html','.css':'text/css','.js':'text/javascript','.json':'application/json'}[ext]||'text/plain';s.writeHead(200,{'content-type':ct});s.end(b);}catch{s.writeHead(404);s.end('not found');}}).listen(4321,()=>console.log('http://localhost:4321'))})})})\""
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
