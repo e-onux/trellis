@@ -1,0 +1,35 @@
+# Trellis profile: frontend application (web UI / components / flows)
+id: frontend
+title: Frontend application
+description: >
+  User-facing web applications and component systems. Optimizes for visible states and
+  user-verifiable behavior; pairs naturally with Storybook-style isolation.
+
+default_budgets:
+  max_files: 15                 # components + styles + stories + tests add up; slightly higher file budget
+  max_lines_of_code: 700        # UI logic should stay thin; heavy logic belongs in a backend capability
+  max_direct_dependencies: 3
+  max_public_operations: 2
+  max_database_tables: 0        # frontend capabilities should not own tables
+  max_external_services: 1
+  max_cyclomatic_complexity: 10
+  max_change_reasons: 1
+
+mandatory_verification:
+  - contract
+  - regression
+  - user_demo                   # the whole point of a UI capability is human-verifiable output
+recommended_verification:
+  - visual
+  - unit
+
+modules:
+  capability_budgets: true
+  evidence_graph: false         # most UI work is design-driven; enable if you cite UX research
+  decision_lifecycle: true
+  extensions: true              # widgets/themes/plugins are common frontend extension points
+  tech_radar: true
+  test_cockpit: true
+
+notes: >
+  Prefer visual + interaction tests over deep unit tests for presentational capabilities.

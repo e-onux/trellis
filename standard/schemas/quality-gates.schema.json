@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trellis.dev/schemas/quality-gates.schema.json",
+  "title": "Trellis Quality Gates",
+  "description": "Declarative list of gates evaluated by `trellis audit` and CI. A gate marked enforced:true fails the build (non-zero exit).",
+  "type": "object",
+  "required": ["version", "gates"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "string" },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "enforced"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "contract", "example", "test", "budget", "decision",
+              "evidence", "drift", "user-visibility", "regression",
+              "extension-completeness", "maintenance", "review-freshness"
+            ]
+          },
+          "description": { "type": "string" },
+          "enforced": { "type": "boolean" },
+          "severity": { "type": "string", "enum": ["error", "warning", "info"], "default": "error" }
+        }
+      }
+    }
+  }
+}

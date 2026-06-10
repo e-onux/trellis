@@ -1,0 +1,35 @@
+# Trellis profile: data pipeline (ETL / batch / streaming transforms)
+id: data-pipeline
+title: Data pipeline
+description: >
+  Batch and streaming transforms, ingestion and enrichment. Optimizes for invariants over
+  examples - correctness across the whole input space matters more than single cases.
+
+default_budgets:
+  max_files: 10
+  max_lines_of_code: 600        # a transform step should be small and composable
+  max_direct_dependencies: 4
+  max_public_operations: 2      # ideally one transform per capability
+  max_database_tables: 4        # pipelines read/write more tables; still bounded
+  max_external_services: 2
+  max_cyclomatic_complexity: 12
+  max_change_reasons: 1
+
+mandatory_verification:
+  - contract
+  - property_based              # invariants ("output never negative", "row count preserved") are the core safety net
+  - regression
+recommended_verification:
+  - integration
+  - performance
+
+modules:
+  capability_budgets: true
+  evidence_graph: true
+  decision_lifecycle: true
+  extensions: true              # importers/exporters/connectors are pipeline extension points
+  tech_radar: true
+  test_cockpit: true            # cockpit shows sample-in → sample-out per step
+
+notes: >
+  Use representative fixtures, never raw production data, for cockpit demos.

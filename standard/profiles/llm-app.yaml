@@ -1,0 +1,36 @@
+# Trellis profile: LLM application (prompt pipelines / RAG / agents)
+id: llm-app
+title: LLM application
+description: >
+  Prompt pipelines, RAG systems and agent tools. Optimizes for evidence and human validation,
+  because outputs are non-deterministic and "tests pass" rarely means "answer is good".
+
+default_budgets:
+  max_files: 12
+  max_lines_of_code: 700
+  max_direct_dependencies: 3    # tight - prompt/model glue sprawls fast
+  max_public_operations: 2
+  max_database_tables: 2
+  max_external_services: 2      # model provider + vector store is common
+  max_cyclomatic_complexity: 10
+  max_change_reasons: 1
+
+mandatory_verification:
+  - contract
+  - regression                  # golden-set regression guards against prompt drift
+  - user_demo                   # a human must confirm answer quality
+recommended_verification:
+  - property_based              # e.g. "answer always cites a retrieved source"
+  - security                    # prompt-injection / data-exfiltration checks
+
+modules:
+  capability_budgets: true
+  evidence_graph: true          # model/prompt/architecture choices should cite benchmarks & papers
+  decision_lifecycle: true
+  extensions: true              # model providers and agent tools are extension points
+  tech_radar: true              # models change monthly - radar + triggers matter most here
+  test_cockpit: true            # cockpit compares expected vs actual model output
+
+notes: >
+  Record expected behavior as invariants and golden sets, not exact-match strings. Re-evaluate model
+  choices on every major provider release (tech-radar trigger).

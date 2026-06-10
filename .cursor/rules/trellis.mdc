@@ -1,0 +1,12 @@
+---
+description: Trellis monorepo - canonical agent rules live in AGENTS.md
+alwaysApply: true
+---
+
+This repository uses **AGENTS.md** as the single, canonical source of agent instructions.
+
+Read and follow [`AGENTS.md`](../../AGENTS.md). It points to [`TRELLIS.md`](../../TRELLIS.md) (the bootstrap
+manifesto) and [`standard/README.md`](../../standard/README.md) (the standard).
+
+This rule file is a thin pointer by design (Trellis rule #8: *single source of truth*). Do not duplicate rules
+here - edit `AGENTS.md` instead.

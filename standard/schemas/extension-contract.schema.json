@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trellis.dev/schemas/extension-contract.schema.json",
+  "title": "Trellis Extension Contract",
+  "description": "Directory-local, machine-readable contract listing the files that MUST be updated to add, change or remove an extension (plugin, module, provider, adapter…). Turns EXTENSIONS.md into a verifiable, living contract.",
+  "type": "object",
+  "required": ["id", "title", "root", "registration"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "title": { "type": "string", "minLength": 1 },
+    "type": {
+      "type": "string",
+      "description": "Extension kind.",
+      "enum": [
+        "plugin", "module", "provider", "adapter", "driver", "connector",
+        "theme", "widget", "cli-command", "event-listener", "middleware",
+        "authentication", "payment-method", "shipping-method", "storage-backend",
+        "importer", "exporter", "ai-model-provider", "agent-tool", "workflow-step"
+      ]
+    },
+    "root": { "type": "string", "description": "Directory under which extension implementations live." },
+    "registration": {
+      "type": "object",
+      "required": ["required_updates"],
+      "additionalProperties": false,
+      "properties": {
+        "required_updates": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/requiredUpdate" }
+        }
+      }
+    },
+    "required_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "implementation", "unit-tests", "contract-tests", "error-scenarios",
+          "configuration-example", "user-documentation", "developer-documentation",
+          "migration", "capability-update", "test-cockpit-registration", "changelog-entry"
+        ]
+      }
+    },
+    "removal": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required_updates": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              { "$ref": "#/$defs/requiredUpdate" }
+            ]
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "properties": { "command": { "type": "string" } }
+    }
+  },
+  "$defs": {
+    "requiredUpdate": {
+      "type": "object",
+      "required": ["path", "operation"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "description": "Repo-relative file that must be updated." },
+        "operation": { "type": "string", "description": "What change is expected, e.g. add-provider, document-environment." },
+        "required": { "type": "boolean", "default": true },
+        "required_if": { "type": "string", "description": "Conditional requirement expression, e.g. extension.requires_environment." }
+      }
+    }
+  }
+}

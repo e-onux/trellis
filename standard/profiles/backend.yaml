@@ -1,0 +1,36 @@
+# Trellis profile: backend service (APIs, domain logic, jobs)
+id: backend
+title: Backend service
+description: >
+  Server-side services, domain logic, background jobs and integrations. Optimizes for
+  clear input/output contracts and strong regression safety.
+
+# Default capability budgets. Rationale on each line; override per capability when justified.
+default_budgets:
+  max_files: 12                 # a capability that needs >12 files is usually two capabilities
+  max_lines_of_code: 800        # keeps a capability reviewable in one sitting
+  max_direct_dependencies: 4    # backend logic tends to fan out; a little more headroom than llm/frontend
+  max_public_operations: 3      # >3 public ops signals multiple responsibilities
+  max_database_tables: 3        # owning many tables hints at a leaked domain boundary
+  max_external_services: 2
+  max_cyclomatic_complexity: 12
+  max_change_reasons: 1         # single-responsibility: one reason to change
+
+mandatory_verification:         # gates fail if these are missing/red
+  - unit
+  - contract
+  - regression
+recommended_verification:
+  - property_based
+  - security
+
+modules:                        # which optional pillars are enabled by default
+  capability_budgets: true
+  evidence_graph: true
+  decision_lifecycle: true
+  extensions: true
+  tech_radar: true
+  test_cockpit: true            # API capabilities expose request/response in the cockpit
+
+notes: >
+  Destructive/stateful operations should be demoed against a sandbox, never production.

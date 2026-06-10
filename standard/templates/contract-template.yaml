@@ -1,0 +1,67 @@
+# Trellis capability contract - validated against standard/schemas/capability-contract.schema.json
+# Copy into capabilities/<id>/contract.yaml and fill in. Delete the comments you don't need.
+
+id: my-capability                # kebab-case, unique in the project
+title: Human readable title
+owner: team-or-domain
+version: 0.1.0
+status: proposed                 # proposed | active | deprecated | superseded | blocked | experimental
+
+intent:
+  description: >
+    One paragraph: what user/system-meaningful behavior this capability provides.
+
+responsibility:                  # semantic budget - the anti-bloat boundary
+  does:
+    - the one or few things this capability is responsible for
+  does_not:                      # behavior here must become a NEW capability, not an extension of this one
+    - things explicitly out of scope
+
+inputs:
+  some_input:
+    type: string
+    required: true
+    description: ""
+
+outputs:
+  some_output:
+    type: string
+
+examples:
+  - name: Normal scenario
+    input: { some_input: "value" }
+    expected: { some_output: "result" }
+  - name: Error scenario          # at least one error scenario is strongly recommended
+    input: { some_input: "" }
+    expected_error: { code: INVALID_INPUT }
+
+invariants:
+  - "describe a property that must hold for every valid input/output"
+
+dependencies:
+  internal: []
+  external: []
+
+budgets:                          # technical limits - see your profile for defaults
+  max_files: 12
+  max_lines_of_code: 800
+  max_direct_dependencies: 3
+  max_public_operations: 1
+  max_cyclomatic_complexity: 10
+  max_change_reasons: 1
+
+verification:                     # required | recommended | optional | not-applicable
+  unit: required
+  contract: required
+  property_based: recommended
+  regression: required
+  user_demo: required
+
+review:
+  interval: 6 months
+  triggers:
+    - business-rule-changed
+    - dependency-budget-exceeded
+
+evidence: []                      # source ids, e.g. [source-001]
+decisions: []                     # ADR ids, e.g. [ADR-0004]

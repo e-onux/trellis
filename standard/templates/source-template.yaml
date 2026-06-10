@@ -1,0 +1,31 @@
+# Trellis source record - validated against standard/schemas/source.schema.json
+# One entry per source. Default to metadata-only; store a local copy ONLY if the license allows it.
+
+id: source-XXX
+title: Title of the paper / doc / benchmark
+authors:
+  - Author Name
+published: 2025
+type: academic-paper        # academic-paper | standard | official-documentation | security-advisory |
+                            # benchmark | experiment | internal-evaluation | user-research |
+                            # incident-report | regulation | rfc | proof-of-concept
+doi: 10.0000/example
+url: https://example.org
+license: CC-BY-4.0
+local_copy:
+  path: null                # only set if license/permission allows storing the file
+  sha256: null
+
+supports:                   # ADR ids and/or capability ids this source backs
+  - ADR-XXXX
+  - capability-id
+
+claims:
+  - text: >
+      The specific claim this source supports.
+    confidence: medium      # low | medium | high
+    limitations:
+      - context where the claim may not hold
+
+last_verified: 2026-01-01
+next_review: 2027-01-01

@@ -1,0 +1,17 @@
+# Technology radar - validated against standard/schemas/technology-radar.schema.json
+# Rings: adopt | trial | assess | hold | deprecate | replace
+version: "0.1"
+entries:
+  - name: example-language
+    category: language
+    ring: adopt
+    since: 2026-01-01
+    decision: ADR-0001
+    review:
+      interval: 12 months
+      next_review: 2027-01-01
+      triggers:
+        - end-of-life announced
+        - security-advisory
+        - a clearly better-supported alternative emerges
+  # Add one entry per significant technology choice. Each `adopt`/`trial` entry should link an ADR.

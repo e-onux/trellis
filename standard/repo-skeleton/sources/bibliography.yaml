@@ -1,0 +1,20 @@
+# Bibliography - list of source records (validated against standard/schemas/source.schema.json)
+# Add one entry per source. Copy standard/templates/source-template.yaml as a starting point.
+sources:
+  - id: source-0001
+    title: "Example: official documentation for the seed decision"
+    type: official-documentation
+    url: https://example.org/docs
+    license: unknown
+    local_copy:
+      path: null
+      sha256: null
+    supports:
+      - ADR-0001
+    relevance:
+      claim: "Recording decisions in-repo is a recognized practice for long-lived projects."
+      confidence: medium
+      limitations:
+        - "Placeholder seed source - replace with a real reference."
+    last_verified: 2026-01-01
+    next_review: 2027-01-01

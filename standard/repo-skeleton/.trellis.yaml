@@ -1,0 +1,42 @@
+# Trellis project configuration.
+# `trellis init` fills these from your choices (--profile / --preset / --agents / --modules).
+version: "0.1"
+standard: "0.1"
+
+# Project profile: backend | frontend | data-pipeline | llm-app
+profile: backend
+
+# Adoption preset: light | standard | strict
+#   light    → fewer enforced gates, looser budgets (start here for brownfield)
+#   standard → recommended defaults
+#   strict   → all gates enforced
+preset: standard
+
+# Agent adapter files to keep in sync (AGENTS.md is always canonical)
+agents:
+  - claude
+  - codex
+  - copilot
+  - cursor
+  - windsurf
+  - gemini
+
+# Optional pillars (default per profile; override here)
+modules:
+  capability_budgets: true
+  evidence_graph: true
+  decision_lifecycle: true
+  extensions: true
+  tech_radar: true
+  test_cockpit: true
+
+# Where governed artifacts live (relative to repo root). Defaults match the standard layout.
+paths:
+  governance: governance
+  product: product
+  tech: tech
+  sources: sources
+  extensions: extensions
+  capabilities: capabilities
+  quality: quality
+  lifecycle: lifecycle

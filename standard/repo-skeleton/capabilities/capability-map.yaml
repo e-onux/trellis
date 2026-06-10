@@ -1,0 +1,10 @@
+# Capability map - the machine-readable index of capabilities.
+# `trellis audit` cross-checks this against the capabilities/ folders and the test cockpit.
+version: "0.1"
+capabilities: []
+# Example entry:
+#   - id: calculate-shipping-cost
+#     status: active
+#     owner: checkout
+#     path: capabilities/calculate-shipping-cost
+#     depends_on: [pricing-table, destination-zone-resolver]
