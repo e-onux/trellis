@@ -1,0 +1,3 @@
+name: Invalid package weight
+input: { destination: DE, weight_kg: -1, method: standard }
+expected_error: { code: INVALID_WEIGHT }

@@ -1,0 +1,20 @@
+{
+  "name": "@e-onux/trellis-core",
+  "version": "0.1.0",
+  "description": "Trellis engine: scaffold, capability budgets, contract & extension validation, repo audit. Pure ESM, runs in Node and the browser.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "yaml": "^2.5.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

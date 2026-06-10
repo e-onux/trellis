@@ -1,0 +1,20 @@
+{
+  "name": "@e-onux/trellis",
+  "version": "0.1.0",
+  "description": "Trellis CLI - bootstrap and govern AI-built repositories: init, validate, budget-check, audit, extension.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "bin": {
+    "trellis": "bin/trellis.js"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "dependencies": {
+    "@e-onux/trellis-core": "0.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

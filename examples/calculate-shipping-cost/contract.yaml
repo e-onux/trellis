@@ -1,0 +1,93 @@
+id: calculate-shipping-cost
+title: Calculate shipping cost
+owner: checkout
+version: 1.0.0
+status: active
+
+intent:
+  description: >
+    Calculate the shipping price and estimated delivery duration from a destination,
+    package weight and delivery method.
+
+responsibility:
+  does:
+    - calculate shipping price
+    - estimate delivery duration
+  does_not:
+    - create orders
+    - process payments
+    - send emails
+
+inputs:
+  destination:
+    type: country-code
+    required: true
+    description: ISO 3166-1 alpha-2 country code.
+  weight_kg:
+    type: number
+    required: true
+    minimum: 0.01
+    maximum: 30
+  method:
+    type: enum
+    required: true
+    values:
+      - standard
+      - express
+
+outputs:
+  amount:
+    type: money
+    description: "{ currency, value }"
+  estimated_days:
+    type: integer
+
+examples:
+  - name: Domestic standard delivery
+    input: { destination: DE, weight_kg: 2, method: standard }
+    expected:
+      amount: { currency: EUR, value: 4.99 }
+      estimated_days: 3
+  - name: Domestic express delivery
+    input: { destination: DE, weight_kg: 2, method: express }
+    expected:
+      amount: { currency: EUR, value: 11.99 }
+      estimated_days: 1
+  - name: Invalid package weight
+    input: { destination: DE, weight_kg: -1, method: standard }
+    expected_error: { code: INVALID_WEIGHT }
+
+invariants:
+  - amount.value >= 0
+  - estimated_days >= 1
+
+dependencies:
+  internal:
+    - pricing-table
+    - destination-zone-resolver
+  external: []
+
+budgets:
+  max_files: 12
+  max_lines_of_code: 800
+  max_direct_dependencies: 3
+  max_public_operations: 1
+  max_cyclomatic_complexity: 10
+  max_change_reasons: 1
+
+verification:
+  unit: required
+  contract: required
+  property_based: recommended
+  regression: required
+  user_demo: required
+
+review:
+  interval: 6 months
+  triggers:
+    - pricing-model-changed
+    - carrier-api-changed
+    - dependency-budget-exceeded
+
+evidence: []
+decisions: []

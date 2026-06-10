@@ -1,0 +1,37 @@
+{
+  "name": "trellis-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Trellis - a capability-first, evidence-governed standard that keeps AI-generated software understandable, testable and maintainable as it grows.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/e-onux/trellis",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/e-onux/trellis.git"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "trellis": "node packages/cli/bin/trellis.js",
+    "test": "node --test packages/core/test/*.test.js",
+    "selfcheck": "node packages/cli/bin/trellis.js validate --root examples/calculate-shipping-cost --capability",
+    "build:web": "node apps/web/build.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "governance",
+    "spec-driven-development",
+    "capability",
+    "adr",
+    "code-quality",
+    "maintainability",
+    "agents.md"
+  ]
+}

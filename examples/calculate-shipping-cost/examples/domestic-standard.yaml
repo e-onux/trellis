@@ -1,0 +1,5 @@
+name: Domestic standard delivery
+input: { destination: DE, weight_kg: 2, method: standard }
+expected:
+  amount: { currency: EUR, value: 4.99 }
+  estimated_days: 3

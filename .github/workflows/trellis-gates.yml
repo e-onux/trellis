@@ -1,0 +1,39 @@
+name: Trellis Quality Gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install
+        run: npm install
+
+      - name: Validate JSON schemas parse
+        run: |
+          for f in standard/schemas/*.json; do
+            node -e "JSON.parse(require('fs').readFileSync('$f','utf8')); console.log('ok: $f')"
+          done
+
+      - name: Unit tests (core engine + example contract)
+        run: |
+          node --test packages/core/test/*.test.js
+          node --test examples/calculate-shipping-cost/tests/contract.test.js
+
+      - name: Self-check (validate the worked example capability)
+        run: npm run selfcheck
+
+      - name: Audit demo project (scaffold + example, enforced gates must pass)
+        run: |
+          node packages/cli/bin/trellis.js init --root /tmp/demo --profile backend --preset standard --agents claude,codex
+          cp -r examples/calculate-shipping-cost /tmp/demo/capabilities/
+          node packages/cli/bin/trellis.js audit --root /tmp/demo
