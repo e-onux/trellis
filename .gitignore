@@ -25,6 +25,7 @@ yarn-error.log*
 *.swp
 .vscode/*
 !.vscode/extensions.json
+.claude/
 
 # Trellis local artifacts (generated reports)
 .trellis/cache/

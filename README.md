@@ -1,6 +1,8 @@
 <div align="center">
 
-# 🌿 Trellis
+<img src="docs/assets/trellis-logo.svg" width="110" alt="Trellis logo">
+
+# Trellis
 
 **A capability-first, evidence-governed standard that keeps AI-generated software understandable, testable and maintainable as it grows.**
 

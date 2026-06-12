@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Trellis logo">
+  <defs>
+    <clipPath id="panel"><rect x="9" y="24" width="46" height="32" rx="9"/></clipPath>
+  </defs>
+  <g clip-path="url(#panel)" stroke="#3fbf7f" stroke-width="2.6" opacity="0.5" fill="none">
+    <path d="M-7 56 L25 24 M9 56 L41 24 M25 56 L57 24 M41 56 L73 24"/>
+    <path d="M39 24 L71 56 M23 24 L55 56 M7 24 L39 56 M-9 24 L23 56"/>
+  </g>
+  <rect x="9" y="24" width="46" height="32" rx="9" fill="none" stroke="#3fbf7f" stroke-width="3" opacity="0.65"/>
+  <path d="M32 56 C30 46, 34 32, 32 17" fill="none" stroke="#6ee7a8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M32 17 C33 10, 39 5, 47 5 C47 13, 41 18, 32 17 Z" fill="#6ee7a8"/>
+  <path d="M32 26 C31 19, 25 14, 17 14 C17 22, 23 27, 32 26 Z" fill="#3fbf7f"/>
+</svg>

@@ -40,7 +40,7 @@ h1, h2, h3 { line-height: 1.15; letter-spacing: -0.02em; }
 }
 .brand { color: var(--text); font-weight: 700; font-size: 1.15rem; display: flex; gap: 8px; align-items: center; }
 .brand:hover { text-decoration: none; }
-.leaf { filter: drop-shadow(0 0 8px rgba(63,191,127,.5)); }
+.brand .logo { display: block; filter: drop-shadow(0 0 8px rgba(63,191,127,.35)); }
 .nav nav { display: flex; gap: clamp(12px, 3vw, 28px); align-items: center; }
 .nav nav a { color: var(--muted); font-size: .95rem; }
 .nav nav a:hover { color: var(--text); text-decoration: none; }

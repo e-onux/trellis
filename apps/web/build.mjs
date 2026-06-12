@@ -35,6 +35,10 @@ for (const f of ['index.html', 'style.css', 'app.js']) {
 fs.copyFileSync(path.join(repoRoot, 'packages', 'core', 'src', 'compose.js'), path.join(dist, 'lib', 'compose.js'));
 fs.copyFileSync(path.join(here, 'lib', 'zip.js'), path.join(dist, 'lib', 'zip.js'));
 
+// 3b) brand assets (single source: docs/assets)
+fs.copyFileSync(path.join(repoRoot, 'docs', 'assets', 'trellis-logo.svg'), path.join(dist, 'logo.svg'));
+fs.copyFileSync(path.join(repoRoot, 'docs', 'assets', 'social-preview.png'), path.join(dist, 'social-preview.png'));
+
 // 4) skeleton.json from repo-skeleton (exclude the generated config + noise)
 const skelRoot = path.join(standardDir, 'repo-skeleton');
 const skeleton = {};
