@@ -11,14 +11,12 @@
     "url": "https://github.com/e-onux/trellis.git"
   },
   "workspaces": [
-    "packages/*",
-    "apps/*"
+    "packages/*"
   ],
   "scripts": {
     "trellis": "node packages/cli/bin/trellis.js",
     "test": "node --test packages/core/test/*.test.js",
-    "selfcheck": "node packages/cli/bin/trellis.js validate --root examples/calculate-shipping-cost --capability",
-    "build:web": "node apps/web/build.mjs"
+    "selfcheck": "node packages/cli/bin/trellis.js validate --root examples/calculate-shipping-cost --capability"
   },
   "engines": {
     "node": ">=18"

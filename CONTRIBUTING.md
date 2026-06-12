@@ -26,7 +26,7 @@ New profiles (e.g. `mobile`, `infra`) or budget recalibration. Each default budg
 
 ### 3. The toolchain (`packages/`)
 
-`core/` is pure ESM and must run in **both Node and the browser** (Phase 2 reuses it in the web wizard) - keep it free of Node-only APIs in modules that the browser will import. `cli/` is the thin Node wrapper.
+`core/` is pure ESM and must run in **both Node and the browser** (the website's wizard, maintained outside this repo, imports it) - keep it free of Node-only APIs in modules that the browser will import. `cli/` is the thin Node wrapper.
 
 - Run `npm install` then `npm test`.
 - Run `npm run selfcheck` - it validates the bundled example capability and must stay green.

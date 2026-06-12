@@ -126,8 +126,6 @@ trellis/
 ├── packages/
 │   ├── core/             ← engine: compose (browser-safe), scaffold, budgets, contract & extension validation, audit
 │   └── cli/              ← `trellis` command (wraps core)
-├── apps/
-│   └── web/              ← landing + wizard (static; reuses core's compose engine) → trellis.sidre.site
 ├── examples/
 │   └── calculate-shipping-cost/   ← a fully worked capability
 ├── capabilities/  tech/decisions/  sources/  quality/   ← this repo governed by its own standard
@@ -136,6 +134,10 @@ trellis/
     ├── integrations/      ← per-tool guides (Claude Code, Codex, Copilot, Cursor, Windsurf, Gemini)
     └── founding-design.md ← the original concept this project grew from
 ```
+
+The landing page + wizard ([trellis.sidre.site](https://trellis.sidre.site)) is maintained in a separate
+website workspace that builds from a checkout of this repository (see ADR-0003); this repo stays the bare
+standard + toolchain.
 
 ## Self-hosted
 
@@ -155,7 +157,7 @@ and CI runs `trellis audit --root .` on every push. A worked end-to-end example 
 ## Roadmap
 
 - ✅ **Phase 1** - open standard, schemas, templates, profiles, multi-platform adapters, worked example, and a working CLI (`init` / `validate` / `budget-check` / `audit` / `extension`).
-- ✅ **Phase 2 - web wizard & landing site** ([`apps/web`](./apps/web), live at [trellis.sidre.site](https://trellis.sidre.site)): a static browser wizard that, from your choices (platforms, profile, greenfield/brownfield, strictness, modules), produces three outputs from the *same `compose` engine the CLI uses*: **copy the tailored AI spec**, **copy an `npx` command**, or **download a `.zip`** starter.
+- ✅ **Phase 2 - web wizard & landing site** (live at [trellis.sidre.site](https://trellis.sidre.site), maintained in a separate website workspace): a static browser wizard that, from your choices (platforms, profile, greenfield/brownfield, strictness, modules), produces three outputs from the *same `compose` engine the CLI uses*: **copy the tailored AI spec**, **copy an `npx` command**, or **download a `.zip`** starter.
 - ✅ **v0.2** - honest gate reporting (unevaluated gates are visible, never silently green), real import scanning for budgets, evidence-graph reference validation, npm packaging, self-hosted governance.
 - ⏳ **Next** - see [ROADMAP.md](./ROADMAP.md): decision/source scaffolding commands, wired test gate, brownfield discovery, then the test cockpit MVP.
 

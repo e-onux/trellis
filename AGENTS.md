@@ -10,13 +10,17 @@ behavior we ship to users is the behavior we apply here.
 
 ## What this repo is
 
-A monorepo with three faces over one engine:
+The bare framework: the standard plus the toolchain, nothing else.
 
 - `standard/` - the open standard: `schemas/`, `templates/`, `profiles/`, `repo-skeleton/`, and `README.md`.
 - `packages/core/` - pure ESM engine (scaffold, budgets, contract/extension validation, audit). **Must run in
-  both Node and the browser** - keep Node-only APIs out of modules the Phase-2 web wizard will import.
+  both Node and the browser** - keep Node-only APIs out of modules the website's wizard imports.
 - `packages/cli/` - the thin `trellis` Node command that wraps core.
 - `examples/` - a fully worked capability (`calculate-shipping-cost`) used by `npm run selfcheck`.
+
+The website (landing + wizard, trellis.sidre.site) is maintained in a separate workspace outside this
+repository; it consumes `packages/core/src/compose.js` and `standard/` from a checkout of this repo
+(see ADR-0003). Marketing material lives outside the repository entirely.
 
 Read [`TRELLIS.md`](./TRELLIS.md) and [`standard/README.md`](./standard/README.md) before substantive work.
 

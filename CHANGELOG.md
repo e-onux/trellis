@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- The website (landing + wizard) moved to a separate workspace outside this repository; the repo
+  stays the bare standard + toolchain (ADR-0003). The GitHub Pages backup deploy was retired;
+  trellis.sidre.site remains the production host.
+
 ## 0.2.0 - 2026-06-12
 
 - Honest gate reporting: a declared gate without a wired check is reported as "not evaluated" instead of silently passing

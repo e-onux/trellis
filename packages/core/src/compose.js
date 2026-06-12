@@ -1,5 +1,6 @@
 // Pure composition logic - NO Node APIs (no node:fs / node:path). Browser-safe by design so the
-// web wizard (apps/web) and the CLI (scaffold.js) generate identical artifacts from one source.
+// website's wizard (maintained outside this repo) and the CLI (scaffold.js) generate identical
+// artifacts from one source.
 
 export const PROFILES = ['backend', 'frontend', 'data-pipeline', 'llm-app'];
 export const PRESETS = ['light', 'standard', 'strict'];
