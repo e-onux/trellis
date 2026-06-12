@@ -12,5 +12,5 @@ Trellis derives tests from contracts. Test types:
 - **Performance** - latency/throughput/memory budgets.
 - **User validation** - a human confirms the output is correct *for the business* (cockpit).
 
-Which are mandatory is set by your profile (`standard/profiles/<profile>.yaml`) and recorded per capability in
+Which are mandatory is set by your profile (see the profiles at https://github.com/e-onux/trellis/tree/main/standard/profiles) and recorded per capability in
 `contract.yaml → verification`.

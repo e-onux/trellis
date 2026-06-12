@@ -1,10 +1,22 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://trellis.dev/schemas/capability-contract.schema.json",
+  "$id": "https://raw.githubusercontent.com/e-onux/trellis/main/standard/schemas/capability-contract.schema.json",
   "title": "Trellis Capability Contract",
   "description": "Machine-checkable, human-readable contract for a single capability. See standard/README.md.",
   "type": "object",
-  "required": ["id", "title", "version", "status", "intent", "responsibility", "inputs", "outputs", "examples", "budgets", "verification"],
+  "required": [
+    "id",
+    "title",
+    "version",
+    "status",
+    "intent",
+    "responsibility",
+    "inputs",
+    "outputs",
+    "examples",
+    "budgets",
+    "verification"
+  ],
   "additionalProperties": false,
   "properties": {
     "id": {
@@ -12,8 +24,14 @@
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
       "description": "Stable kebab-case identifier, unique within the project."
     },
-    "title": { "type": "string", "minLength": 1 },
-    "owner": { "type": "string", "description": "Team or domain that owns this capability." },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "owner": {
+      "type": "string",
+      "description": "Team or domain that owns this capability."
+    },
     "version": {
       "type": "string",
       "pattern": "^\\d+\\.\\d+\\.\\d+$",
@@ -21,35 +39,66 @@
     },
     "status": {
       "type": "string",
-      "enum": ["proposed", "active", "deprecated", "superseded", "blocked", "experimental"]
+      "enum": [
+        "proposed",
+        "active",
+        "deprecated",
+        "superseded",
+        "blocked",
+        "experimental"
+      ]
     },
     "intent": {
       "type": "object",
-      "required": ["description"],
+      "required": [
+        "description"
+      ],
       "additionalProperties": false,
       "properties": {
-        "description": { "type": "string", "minLength": 1 }
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "responsibility": {
       "type": "object",
-      "required": ["does", "does_not"],
+      "required": [
+        "does",
+        "does_not"
+      ],
       "additionalProperties": false,
       "description": "Semantic boundary. New behavior that fits `does` may extend; behavior that hits `does_not` must become a new capability.",
       "properties": {
-        "does": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-        "does_not": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+        "does": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "does_not": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
       }
     },
     "inputs": {
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": { "$ref": "#/$defs/field" }
+      "additionalProperties": {
+        "$ref": "#/$defs/field"
+      }
     },
     "outputs": {
       "type": "object",
       "minProperties": 1,
-      "additionalProperties": { "$ref": "#/$defs/field" }
+      "additionalProperties": {
+        "$ref": "#/$defs/field"
+      }
     },
     "examples": {
       "type": "array",
@@ -57,110 +106,238 @@
       "description": "At least one normal scenario; at least one error scenario is strongly recommended.",
       "items": {
         "type": "object",
-        "required": ["name", "input"],
+        "required": [
+          "name",
+          "input"
+        ],
         "additionalProperties": false,
         "properties": {
-          "name": { "type": "string" },
-          "input": { "type": "object" },
-          "expected": { "type": "object", "description": "Expected output for a success scenario." },
+          "name": {
+            "type": "string"
+          },
+          "input": {
+            "type": "object"
+          },
+          "expected": {
+            "type": "object",
+            "description": "Expected output for a success scenario."
+          },
           "expected_error": {
             "type": "object",
-            "required": ["code"],
-            "properties": { "code": { "type": "string" }, "message": { "type": "string" } },
+            "required": [
+              "code"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
             "description": "Expected error for a failure scenario."
           }
         },
         "anyOf": [
-          { "required": ["expected"] },
-          { "required": ["expected_error"] }
+          {
+            "required": [
+              "expected"
+            ]
+          },
+          {
+            "required": [
+              "expected_error"
+            ]
+          }
         ]
       }
     },
     "invariants": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Properties that must hold for every valid input/output (used by property-based tests)."
     },
     "dependencies": {
       "oneOf": [
-        { "type": "array", "items": { "type": "string" } },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "internal": { "type": "array", "items": { "type": "string" } },
-            "external": { "type": "array", "items": { "type": "string" } }
+            "internal": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "external": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         }
       ]
     },
-    "budgets": { "$ref": "#/$defs/budgets" },
+    "budgets": {
+      "$ref": "#/$defs/budgets"
+    },
     "verification": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "unit": { "$ref": "#/$defs/verificationLevel" },
-        "contract": { "$ref": "#/$defs/verificationLevel" },
-        "property_based": { "$ref": "#/$defs/verificationLevel" },
-        "regression": { "$ref": "#/$defs/verificationLevel" },
-        "integration": { "$ref": "#/$defs/verificationLevel" },
-        "visual": { "$ref": "#/$defs/verificationLevel" },
-        "security": { "$ref": "#/$defs/verificationLevel" },
-        "performance": { "$ref": "#/$defs/verificationLevel" },
-        "user_demo": { "$ref": "#/$defs/verificationLevel" }
+        "unit": {
+          "$ref": "#/$defs/verificationLevel"
+        },
+        "contract": {
+          "$ref": "#/$defs/verificationLevel"
+        },
+        "property_based": {
+          "$ref": "#/$defs/verificationLevel"
+        },
+        "regression": {
+          "$ref": "#/$defs/verificationLevel"
+        },
+        "integration": {
+          "$ref": "#/$defs/verificationLevel"
+        },
+        "visual": {
+          "$ref": "#/$defs/verificationLevel"
+        },
+        "security": {
+          "$ref": "#/$defs/verificationLevel"
+        },
+        "performance": {
+          "$ref": "#/$defs/verificationLevel"
+        },
+        "user_demo": {
+          "$ref": "#/$defs/verificationLevel"
+        }
       }
     },
-    "review": { "$ref": "#/$defs/review" },
+    "review": {
+      "$ref": "#/$defs/review"
+    },
     "evidence": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Source ids (see sources/bibliography.yaml) backing this capability's expected behavior."
     },
     "decisions": {
       "type": "array",
-      "items": { "type": "string", "pattern": "^ADR-\\d{4}$" },
+      "items": {
+        "type": "string",
+        "pattern": "^ADR-\\d{4}$"
+      },
       "description": "Related ADR ids."
     }
   },
   "$defs": {
     "field": {
       "type": "object",
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "properties": {
-        "type": { "type": "string" },
-        "required": { "type": "boolean" },
-        "minimum": { "type": "number" },
-        "maximum": { "type": "number" },
-        "values": { "type": "array" },
-        "description": { "type": "string" }
+        "type": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "values": {
+          "type": "array"
+        },
+        "description": {
+          "type": "string"
+        }
       }
     },
     "verificationLevel": {
       "type": "string",
-      "enum": ["required", "recommended", "optional", "not-applicable"]
+      "enum": [
+        "required",
+        "recommended",
+        "optional",
+        "not-applicable"
+      ]
     },
     "budgets": {
       "type": "object",
       "additionalProperties": false,
       "description": "Technical and semantic limits. Exceeding a budget blocks new code until a split/refactor proposal exists.",
       "properties": {
-        "max_files": { "type": "integer", "minimum": 1 },
-        "max_lines_of_code": { "type": "integer", "minimum": 1 },
-        "max_direct_dependencies": { "type": "integer", "minimum": 0 },
-        "max_public_operations": { "type": "integer", "minimum": 1 },
-        "max_database_tables": { "type": "integer", "minimum": 0 },
-        "max_external_services": { "type": "integer", "minimum": 0 },
-        "max_cyclomatic_complexity": { "type": "integer", "minimum": 1 },
-        "max_nesting_depth": { "type": "integer", "minimum": 1 },
-        "max_change_reasons": { "type": "integer", "minimum": 1 }
+        "max_files": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_lines_of_code": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_direct_dependencies": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_public_operations": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_database_tables": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_external_services": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_cyclomatic_complexity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_nesting_depth": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_change_reasons": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     },
     "review": {
       "type": "object",
       "properties": {
-        "interval": { "type": "string", "description": "e.g. '6 months'." },
-        "next_review": { "type": "string", "format": "date" },
-        "triggers": { "type": "array", "items": { "type": "string" } }
+        "interval": {
+          "type": "string",
+          "description": "e.g. '6 months'."
+        },
+        "next_review": {
+          "type": "string",
+          "format": "date"
+        },
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     }
   }

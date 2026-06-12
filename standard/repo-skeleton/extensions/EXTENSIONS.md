@@ -28,5 +28,5 @@ A new extension is not complete until:
 [ ] Removal/cleanup steps defined
 ```
 
-See `types/` for per-kind guidance and `standard/templates/extension-registration-template.md` /
+See `types/` for per-kind guidance and `https://github.com/e-onux/trellis/blob/main/standard/templates/extension-registration-template.md` /
 `extension-removal-template.md` for copyable starting points.

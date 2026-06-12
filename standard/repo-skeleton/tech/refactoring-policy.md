@@ -3,7 +3,7 @@
 **Refactor before collapse.** A budget breach triggers refactoring *before* the code becomes unmaintainable,
 not after.
 
-A refactor proposal (see `standard/templates/refactor-proposal-template.md`) is required when a capability:
+A refactor proposal (see `https://github.com/e-onux/trellis/blob/main/standard/templates/refactor-proposal-template.md`) is required when a capability:
 
 - exceeds any technical budget;
 - accumulates more than `max_change_reasons` distinct reasons to change;

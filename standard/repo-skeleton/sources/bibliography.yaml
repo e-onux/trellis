@@ -1,5 +1,5 @@
 # Bibliography - list of source records (validated against standard/schemas/source.schema.json)
-# Add one entry per source. Copy standard/templates/source-template.yaml as a starting point.
+# Add one entry per source. Copy https://github.com/e-onux/trellis/blob/main/standard/templates/source-template.yaml as a starting point.
 sources:
   - id: source-0001
     title: "Example: official documentation for the seed decision"

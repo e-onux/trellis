@@ -55,4 +55,4 @@ rollback:
 
 ## Notes
 
-This is ADR-0001 by convention. Copy `standard/templates/adr-template.md` for new decisions and increment the number.
+This is ADR-0001 by convention. Copy `https://github.com/e-onux/trellis/blob/main/standard/templates/adr-template.md` for new decisions and increment the number.

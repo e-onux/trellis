@@ -1,72 +1,173 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://trellis.dev/schemas/adr.schema.json",
+  "$id": "https://raw.githubusercontent.com/e-onux/trellis/main/standard/schemas/adr.schema.json",
   "title": "Trellis Architecture Decision Record",
   "description": "A conditional, reviewable decision with evidence and re-evaluation triggers. Decisions are accepted as conditional, not permanent.",
   "type": "object",
-  "required": ["id", "title", "status", "date", "context", "decision", "consequences", "review"],
+  "required": [
+    "id",
+    "title",
+    "status",
+    "date",
+    "context",
+    "decision",
+    "consequences",
+    "review"
+  ],
   "additionalProperties": false,
   "properties": {
-    "id": { "type": "string", "pattern": "^ADR-\\d{4}$" },
-    "title": { "type": "string", "minLength": 1 },
+    "id": {
+      "type": "string",
+      "pattern": "^ADR-\\d{4}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
     "status": {
       "type": "string",
-      "enum": ["proposed", "accepted", "experimental", "deprecated", "superseded", "rejected", "under-review"]
+      "enum": [
+        "proposed",
+        "accepted",
+        "experimental",
+        "deprecated",
+        "superseded",
+        "rejected",
+        "under-review"
+      ]
     },
-    "date": { "type": "string", "format": "date" },
-    "superseded_by": { "type": "string", "pattern": "^ADR-\\d{4}$" },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "superseded_by": {
+      "type": "string",
+      "pattern": "^ADR-\\d{4}$"
+    },
     "context": {
       "type": "object",
-      "required": ["description"],
-      "properties": { "description": { "type": "string", "minLength": 1 } }
+      "required": [
+        "description"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     },
     "decision": {
       "type": "object",
-      "required": ["selected"],
-      "properties": { "selected": { "type": "string" }, "summary": { "type": "string" } }
+      "required": [
+        "selected"
+      ],
+      "properties": {
+        "selected": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        }
+      }
     },
-    "alternatives": { "type": "array", "items": { "type": "string" } },
+    "alternatives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "evidence": {
       "type": "array",
       "description": "Links to source records that justify this decision.",
       "items": {
         "type": "object",
-        "required": ["id"],
+        "required": [
+          "id"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "type": { "type": "string" }
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
         }
       }
     },
     "assumptions": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Conditions under which this decision is valid. If an assumption breaks, the decision must be reviewed."
     },
     "consequences": {
       "type": "object",
       "properties": {
-        "positive": { "type": "array", "items": { "type": "string" } },
-        "negative": { "type": "array", "items": { "type": "string" } }
+        "positive": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "negative": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
     "review": {
       "type": "object",
-      "required": ["interval", "triggers"],
+      "required": [
+        "interval",
+        "triggers"
+      ],
       "properties": {
-        "interval": { "type": "string" },
-        "next_review": { "type": "string", "format": "date" },
-        "triggers": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+        "interval": {
+          "type": "string"
+        },
+        "next_review": {
+          "type": "string",
+          "format": "date"
+        },
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
       }
     },
-    "affected_capabilities": { "type": "array", "items": { "type": "string" } },
+    "affected_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "migration": {
       "type": "object",
-      "properties": { "required": { "type": "boolean" }, "plan": { "type": "string" } }
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "plan": {
+          "type": "string"
+        }
+      }
     },
     "rollback": {
       "type": "object",
-      "properties": { "available": { "type": "boolean" }, "plan": { "type": "string" } }
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "plan": {
+          "type": "string"
+        }
+      }
     }
   }
 }

@@ -1,31 +1,71 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://trellis.dev/schemas/technology-radar.schema.json",
+  "$id": "https://raw.githubusercontent.com/e-onux/trellis/main/standard/schemas/technology-radar.schema.json",
   "title": "Trellis Technology Radar",
   "description": "Living record of technology choices, their ring, and the triggers that should force re-evaluation.",
   "type": "object",
-  "required": ["version", "entries"],
+  "required": [
+    "version",
+    "entries"
+  ],
   "additionalProperties": false,
   "properties": {
-    "version": { "type": "string" },
+    "version": {
+      "type": "string"
+    },
     "entries": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "ring"],
+        "required": [
+          "name",
+          "ring"
+        ],
         "additionalProperties": false,
         "properties": {
-          "name": { "type": "string" },
-          "category": { "type": "string", "description": "e.g. language, datastore, framework, infra, ai-model." },
-          "ring": { "type": "string", "enum": ["adopt", "trial", "assess", "hold", "deprecate", "replace"] },
-          "since": { "type": "string", "format": "date" },
-          "decision": { "type": "string", "pattern": "^ADR-\\d{4}$", "description": "ADR that recorded this choice." },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "description": "e.g. language, datastore, framework, infra, ai-model."
+          },
+          "ring": {
+            "type": "string",
+            "enum": [
+              "adopt",
+              "trial",
+              "assess",
+              "hold",
+              "deprecate",
+              "replace"
+            ]
+          },
+          "since": {
+            "type": "string",
+            "format": "date"
+          },
+          "decision": {
+            "type": "string",
+            "pattern": "^ADR-\\d{4}$",
+            "description": "ADR that recorded this choice."
+          },
           "review": {
             "type": "object",
             "properties": {
-              "interval": { "type": "string" },
-              "next_review": { "type": "string", "format": "date" },
-              "triggers": { "type": "array", "items": { "type": "string" } }
+              "interval": {
+                "type": "string"
+              },
+              "next_review": {
+                "type": "string",
+                "format": "date"
+              },
+              "triggers": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
             }
           }
         }

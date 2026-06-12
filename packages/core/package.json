@@ -1,16 +1,30 @@
 {
   "name": "@e-onux/trellis-core",
-  "version": "0.1.0",
-  "description": "Trellis engine: scaffold, capability budgets, contract & extension validation, repo audit. Pure ESM, runs in Node and the browser.",
+  "version": "0.2.0",
+  "description": "Trellis engine: scaffold, capability budgets with real import scanning, contract and extension validation, repo audit with honest quality gates. Pure ESM, runs in Node and the browser.",
   "type": "module",
   "license": "Apache-2.0",
+  "homepage": "https://github.com/e-onux/trellis",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/e-onux/trellis.git",
+    "directory": "packages/core"
+  },
   "main": "src/index.js",
   "exports": {
     ".": "./src/index.js"
   },
   "files": [
-    "src"
+    "src",
+    "standard"
   ],
+  "scripts": {
+    "prepack": "node -e \"const fs=require('fs');fs.rmSync('standard',{recursive:true,force:true});fs.cpSync('../../standard','standard',{recursive:true})\"",
+    "postpack": "node -e \"require('fs').rmSync('standard',{recursive:true,force:true})\""
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "yaml": "^2.5.0"
   },
