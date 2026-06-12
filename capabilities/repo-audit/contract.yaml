@@ -1,0 +1,81 @@
+id: repo-audit
+title: Audit a governed repository
+owner: toolchain
+version: 0.2.0
+status: active
+
+intent:
+  description: >
+    Produce the whole-repository health report: contract validity, budgets, review freshness,
+    evidence-graph integrity, extension completeness, and the quality-gate verdict. Gates
+    without a wired check are reported as not evaluated, never silently passed.
+
+responsibility:
+  does:
+    - discover capabilities and aggregate their checks
+    - validate evidence and decision references
+    - map findings to declared quality gates and compute the verdict
+  does_not:
+    - run test suites (the test gate is not evaluated yet)
+    - modify the repository
+
+inputs:
+  repo_root:
+    type: string
+    required: true
+
+outputs:
+  summary:
+    type: object
+  gates:
+    type: array
+  ok:
+    type: boolean
+
+examples:
+  - name: Healthy repository passes
+    input:
+      repo_root: .
+    expected:
+      ok: true
+  - name: Enforced gate failure
+    input:
+      repo_root: ./over-budget-project
+    expected_error:
+      code: GATE_FAILURE
+
+invariants:
+  - only a measured, failing, enforced gate fails the build
+  - a gate with no wired check is reported as not-evaluated
+
+dependencies:
+  internal:
+    - contract-validation
+    - budget-check
+    - extension-completeness
+  external: []
+
+implementation:
+  - packages/core/src/audit.js
+
+budgets:
+  max_files: 2
+  max_lines_of_code: 300
+  max_direct_dependencies: 1
+  max_public_operations: 1
+  max_cyclomatic_complexity: 12
+  max_change_reasons: 1
+
+verification:
+  unit: required
+  contract: required
+  regression: required
+
+review:
+  interval: 6 months
+  triggers:
+    - new gate gains a wired check
+    - quality-gates schema changes
+
+evidence: []
+decisions: []

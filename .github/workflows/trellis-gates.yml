@@ -32,8 +32,22 @@ jobs:
       - name: Self-check (validate the worked example capability)
         run: npm run selfcheck
 
+      - name: Self-audit (this repo is governed by its own standard)
+        run: node packages/cli/bin/trellis.js audit --root .
+
       - name: Audit demo project (scaffold + example, enforced gates must pass)
         run: |
           node packages/cli/bin/trellis.js init --root /tmp/demo --profile backend --preset standard --agents claude,codex
           cp -r examples/calculate-shipping-cost /tmp/demo/capabilities/
           node packages/cli/bin/trellis.js audit --root /tmp/demo
+
+      - name: Pack smoke test (simulates npx install outside the monorepo)
+        run: |
+          mkdir -p /tmp/packtest
+          (cd packages/core && npm pack --pack-destination /tmp/packtest)
+          (cd packages/cli && npm pack --pack-destination /tmp/packtest)
+          cd /tmp/packtest && npm init -y
+          npm install ./e-onux-trellis-core-*.tgz
+          npm install ./e-onux-trellis-*.tgz
+          npx trellis init --root /tmp/packtest/demo --profile llm-app --preset strict --agents claude
+          npx trellis audit --root /tmp/packtest/demo

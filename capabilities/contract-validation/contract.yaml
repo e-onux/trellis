@@ -1,0 +1,76 @@
+id: contract-validation
+title: Validate a capability contract
+owner: toolchain
+version: 0.2.0
+status: active
+
+intent:
+  description: >
+    Check a parsed capability contract for structural validity: required fields, id and version
+    format, semantic boundary, at least one normal example, budgets and verification levels.
+
+responsibility:
+  does:
+    - validate contract structure and formats
+    - report errors and warnings separately
+  does_not:
+    - measure budgets against code (budget-check)
+    - read files from disk (callers parse YAML first)
+
+inputs:
+  contract:
+    type: object
+    required: true
+    description: Parsed contract.yaml content.
+
+outputs:
+  ok:
+    type: boolean
+  errors:
+    type: array
+  warnings:
+    type: array
+
+examples:
+  - name: Valid contract passes
+    input:
+      contract: { id: shipping, version: 1.0.0 }
+    expected:
+      ok: true
+  - name: Unparseable contract file
+    input:
+      contract_path: capabilities/broken/contract.yaml
+    expected_error:
+      code: PARSE_ERROR
+
+invariants:
+  - a contract without a normal example never validates
+  - warnings never flip ok to false
+
+dependencies:
+  internal: []
+  external: []
+
+implementation:
+  - packages/core/src/contract.js
+
+budgets:
+  max_files: 2
+  max_lines_of_code: 300
+  max_direct_dependencies: 1
+  max_public_operations: 1
+  max_cyclomatic_complexity: 12
+  max_change_reasons: 1
+
+verification:
+  unit: required
+  contract: required
+  regression: required
+
+review:
+  interval: 6 months
+  triggers:
+    - capability-contract schema changes
+
+evidence: []
+decisions: []

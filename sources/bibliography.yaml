@@ -1,0 +1,23 @@
+# Bibliography - evidence records for this repository's own decisions.
+# Validated against standard/schemas/source.schema.json.
+sources:
+  - id: source-0001
+    title: "AGENTS.md - a simple, open format for guiding coding agents"
+    type: official-documentation
+    url: https://agents.md/
+    license: unknown
+    local_copy:
+      path: null
+      sha256: null
+    supports:
+      - ADR-0002
+    relevance:
+      claim: >
+        AGENTS.md is a cross-tool instruction format stewarded under the Linux Foundation's
+        Agentic AI Foundation and read natively by Codex, Cursor, Copilot, Gemini CLI, Aider,
+        Windsurf, Zed and others, with tens of thousands of adopting repositories as of mid-2026.
+      confidence: high
+      limitations:
+        - "Adoption figures move quickly; revisit at review time."
+    last_verified: 2026-06-12
+    next_review: 2027-06-12

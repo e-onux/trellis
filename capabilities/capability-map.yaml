@@ -1,0 +1,28 @@
+# Capability map for the Trellis monorepo itself.
+version: "0.1"
+capabilities:
+  - id: contract-validation
+    status: active
+    owner: toolchain
+    path: capabilities/contract-validation
+    depends_on: []
+  - id: budget-check
+    status: active
+    owner: toolchain
+    path: capabilities/budget-check
+    depends_on: []
+  - id: extension-completeness
+    status: active
+    owner: toolchain
+    path: capabilities/extension-completeness
+    depends_on: []
+  - id: repo-audit
+    status: active
+    owner: toolchain
+    path: capabilities/repo-audit
+    depends_on: [contract-validation, budget-check, extension-completeness]
+  - id: compose-artifacts
+    status: active
+    owner: toolchain
+    path: capabilities/compose-artifacts
+    depends_on: []

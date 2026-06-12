@@ -1,0 +1,76 @@
+id: extension-completeness
+title: Verify extension registration completeness
+owner: toolchain
+version: 0.2.0
+status: active
+
+intent:
+  description: >
+    Read directory-local extension-registry.yaml contracts and verify that every required
+    registration path exists, turning EXTENSIONS.md into a machine-verifiable contract.
+
+responsibility:
+  does:
+    - find extension registries in a repository
+    - check required_updates paths and report missing or conditional ones
+  does_not:
+    - verify the content of registrations (only their presence)
+    - manage extension lifecycle or removal itself
+
+inputs:
+  repo_root:
+    type: string
+    required: true
+  extension_id:
+    type: string
+    description: Optional filter to a single extension contract.
+
+outputs:
+  ok:
+    type: boolean
+  results:
+    type: array
+
+examples:
+  - name: All registration points present
+    input:
+      repo_root: .
+    expected:
+      ok: true
+  - name: Missing required registration
+    input:
+      repo_root: ./broken-project
+    expected_error:
+      code: MISSING_REGISTRATION
+
+invariants:
+  - a required update whose path is missing always fails the check
+  - conditional requirements (required_if) are reported, never silently skipped
+
+dependencies:
+  internal: []
+  external: []
+
+implementation:
+  - packages/core/src/extension.js
+
+budgets:
+  max_files: 2
+  max_lines_of_code: 200
+  max_direct_dependencies: 1
+  max_public_operations: 2
+  max_cyclomatic_complexity: 10
+  max_change_reasons: 1
+
+verification:
+  unit: required
+  contract: required
+  regression: required
+
+review:
+  interval: 6 months
+  triggers:
+    - extension-contract schema changes
+
+evidence: []
+decisions: []

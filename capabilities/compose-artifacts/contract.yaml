@@ -1,0 +1,89 @@
+id: compose-artifacts
+title: Compose governed-repo artifacts
+owner: toolchain
+version: 0.2.0
+status: active
+
+intent:
+  description: >
+    Generate the artifacts a governed repository needs: the tailored bootstrap manifesto,
+    canonical AGENTS.md, thin per-tool pointer files, the .trellis.yaml config and the npx
+    command. One browser-safe engine feeds both the CLI scaffold and the web wizard so their
+    output can never drift.
+
+responsibility:
+  does:
+    - compose bootstrap, adapters, config and command text from profile/preset/agent choices
+    - scaffold the repo skeleton and write adapters on disk (CLI side)
+  does_not:
+    - carry agent rules anywhere except the canonical AGENTS.md content
+    - touch the network
+
+inputs:
+  profile:
+    type: enum
+    required: true
+    values: [backend, frontend, data-pipeline, llm-app]
+  preset:
+    type: enum
+    required: true
+    values: [light, standard, strict]
+  agents:
+    type: array
+
+outputs:
+  files:
+    type: array
+  config:
+    type: object
+
+examples:
+  - name: Backend scaffold with two agents
+    input:
+      profile: backend
+      preset: standard
+      agents: [claude, codex]
+    expected:
+      files: [AGENTS.md, CLAUDE.md]
+  - name: Unknown profile is rejected
+    input:
+      profile: mobile
+      preset: standard
+    expected_error:
+      code: UNKNOWN_PROFILE
+
+invariants:
+  - pointer files never contain rules, only references to AGENTS.md
+  - the same selection produces identical artifacts in CLI and browser
+
+dependencies:
+  internal: []
+  external: []
+
+implementation:
+  - packages/core/src/compose.js
+  - packages/core/src/scaffold.js
+
+budgets:
+  max_files: 3
+  max_lines_of_code: 600
+  max_direct_dependencies: 1
+  max_public_operations: 8
+  max_cyclomatic_complexity: 12
+  max_change_reasons: 2
+
+verification:
+  unit: required
+  contract: required
+  regression: required
+
+review:
+  interval: 6 months
+  triggers:
+    - a new agent tool needs an adapter
+    - AGENTS.md ecosystem changes (see ADR-0002)
+
+evidence:
+  - source-0001
+decisions:
+  - ADR-0002

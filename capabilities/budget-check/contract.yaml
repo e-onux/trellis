@@ -1,0 +1,79 @@
+id: budget-check
+title: Check capability budgets against real code
+owner: toolchain
+version: 0.2.0
+status: active
+
+intent:
+  description: >
+    Measure a capability's footprint (files, lines of code, real imports) against the budgets
+    declared in its contract. Prefers what the code actually imports over what is declared.
+
+responsibility:
+  does:
+    - resolve implementation files (declared list or capability directory)
+    - measure files, LOC and external imports
+    - report violations per budget
+  does_not:
+    - validate contract structure (contract-validation)
+    - fix or refactor over-budget code
+
+inputs:
+  capability_dir:
+    type: string
+    required: true
+  repo_root:
+    type: string
+
+outputs:
+  ok:
+    type: boolean
+  checks:
+    type: array
+  violations:
+    type: array
+
+examples:
+  - name: Capability within budget
+    input:
+      capability_dir: examples/calculate-shipping-cost
+    expected:
+      ok: true
+  - name: Over budget fails the gate
+    input:
+      capability_dir: capabilities/oversized
+    expected_error:
+      code: BUDGET_EXCEEDED
+
+invariants:
+  - an unmeasurable budget is reported as declared-only, never as passed
+  - real imports take precedence over declared dependencies
+
+dependencies:
+  internal: []
+  external: []
+
+implementation:
+  - packages/core/src/budgets.js
+
+budgets:
+  max_files: 2
+  max_lines_of_code: 300
+  max_direct_dependencies: 1
+  max_public_operations: 2
+  max_cyclomatic_complexity: 12
+  max_change_reasons: 1
+
+verification:
+  unit: required
+  contract: required
+  regression: required
+
+review:
+  interval: 6 months
+  triggers:
+    - new measurable budget added
+    - new language support for import scanning
+
+evidence: []
+decisions: []
