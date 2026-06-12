@@ -1,0 +1,32 @@
+name: Bug report
+description: Something in the CLI, engine or scaffold does not behave as documented
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Trellis version
+      placeholder: "0.2.0 (npx trellis version)"
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. npx @e-onux/trellis init --profile backend
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+      description: What should have happened, and what happened instead (paste CLI output).
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "macOS 15 / Node 22"

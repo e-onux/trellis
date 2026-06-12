@@ -1,0 +1,30 @@
+name: Standard proposal
+description: Propose a change to the Trellis standard (schemas, directory model, gates, budgets)
+labels: [standard]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What real situation does the current standard handle badly?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Why do you believe this? A repo, an incident, a paper, a benchmark. Evidence over confidence.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Which schema/template/gate changes, and what breaks (schemas are versioned).
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Who is affected, migration story, backward compatibility.

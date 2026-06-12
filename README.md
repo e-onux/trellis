@@ -130,15 +130,34 @@ trellis/
 │   └── web/              ← landing + wizard (static; reuses core's compose engine) → trellis.sidre.site
 ├── examples/
 │   └── calculate-shipping-cost/   ← a fully worked capability
+├── capabilities/  tech/decisions/  sources/  quality/   ← this repo governed by its own standard
 └── docs/
+    ├── comparison.md      ← how Trellis relates to Spec Kit, OpenSpec, BMAD, Kiro, Tessl, AGENTS.md
+    ├── integrations/      ← per-tool guides (Claude Code, Codex, Copilot, Cursor, Windsurf, Gemini)
     └── founding-design.md ← the original concept this project grew from
 ```
+
+## Self-hosted
+
+Trellis applies its own standard to this repository: the engine's behaviors are
+[capability contracts](./capabilities/index.md) whose budgets measure the real source files,
+decisions live in [ADRs](./tech/decisions/index.md) backed by [sources](./sources/bibliography.yaml),
+and CI runs `trellis audit --root .` on every push. A worked end-to-end example app lives at
+[e-onux/trellis-example-app](https://github.com/e-onux/trellis-example-app).
+
+## Docs
+
+- [Getting started](./docs/getting-started.md)
+- [How Trellis relates to other tools](./docs/comparison.md)
+- [Integration guides](./docs/integrations/claude-code.md): [Claude Code](./docs/integrations/claude-code.md) · [Codex](./docs/integrations/codex.md) · [Copilot](./docs/integrations/copilot.md) · [Cursor](./docs/integrations/cursor.md) · [Windsurf](./docs/integrations/windsurf.md) · [Gemini](./docs/integrations/gemini.md)
+- [Roadmap](./ROADMAP.md) · [Changelog](./CHANGELOG.md)
 
 ## Roadmap
 
 - ✅ **Phase 1** - open standard, schemas, templates, profiles, multi-platform adapters, worked example, and a working CLI (`init` / `validate` / `budget-check` / `audit` / `extension`).
 - ✅ **Phase 2 - web wizard & landing site** ([`apps/web`](./apps/web), live at [trellis.sidre.site](https://trellis.sidre.site)): a static browser wizard that, from your choices (platforms, profile, greenfield/brownfield, strictness, modules), produces three outputs from the *same `compose` engine the CLI uses*: **copy the tailored AI spec**, **copy an `npx` command**, or **download a `.zip`** starter.
-- ⏳ **Phase 3** - capability health score, architecture-drift detector, and the live test cockpit.
+- ✅ **v0.2** - honest gate reporting (unevaluated gates are visible, never silently green), real import scanning for budgets, evidence-graph reference validation, npm packaging, self-hosted governance.
+- ⏳ **Next** - see [ROADMAP.md](./ROADMAP.md): decision/source scaffolding commands, wired test gate, brownfield discovery, then the test cockpit MVP.
 
 ## Status
 

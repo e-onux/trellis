@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions and feedback
+    url: https://github.com/e-onux/trellis/discussions
+    about: For "would this fit my workflow?" questions, adoption stories and open-ended feedback.
+  - name: Try the wizard
+    url: https://trellis.sidre.site
+    about: Generate a tailored bootstrap, npx command or starter zip in the browser.
