@@ -87,3 +87,66 @@ test('audit on the example capability (copied into a scaffold) is healthy', () =
   assert.equal(report.summary.healthy, 1, JSON.stringify(report.capabilities[0]));
   assert.equal(report.ok, true);
 });
+
+test('audit reports gates without wired checks as not-evaluated, never silently passed', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'trellis-honest-'));
+  init({ repoRoot: tmp, profile: 'backend', preset: 'standard' });
+  const report = audit(tmp);
+  const byId = Object.fromEntries(report.gates.map((g) => [g.id, g]));
+  assert.equal(byId.regression.status, 'not-evaluated', 'regression has no check wired');
+  assert.equal(byId.drift.status, 'not-evaluated');
+  assert.equal(byId.evidence.status, 'passed', 'evidence IS measured via reference integrity');
+  assert.ok(report.summary.gatesNotEvaluated >= 2);
+  assert.equal(report.ok, true, 'not-evaluated enforced gates must not fail the build');
+});
+
+test('budgetCheck measures real imports instead of trusting declarations', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'trellis-imports-'));
+  fs.writeFileSync(path.join(tmp, 'contract.yaml'), [
+    'id: imports-cap', 'title: T', 'version: 1.0.0', 'status: active',
+    'intent: { description: x }',
+    'responsibility: { does: [x], does_not: [y] }',
+    'inputs: { a: { type: string } }', 'outputs: { b: { type: string } }',
+    'examples:', '  - { name: ok, input: { a: x }, expected: { b: y } }',
+    'dependencies: { internal: [], external: [] }',
+    'budgets: { max_direct_dependencies: 1 }',
+    'verification: { contract: required }', ''
+  ].join('\n'));
+  fs.writeFileSync(path.join(tmp, 'impl.js'), [
+    "import express from 'express';",
+    "import YAML from 'yaml';",
+    "import fs from 'node:fs';",
+    "import { helper } from './helper.js';",
+    "export const x = 1;"
+  ].join('\n'));
+  const b = budgetCheck(tmp, { repoRoot: tmp });
+  assert.equal(b.depsSource, 'imports');
+  assert.deepEqual(b.externalImports, ['express', 'yaml']);
+  assert.equal(b.ok, false, 'two real imports exceed the budget of one even though zero are declared');
+});
+
+test('audit flags broken evidence and decision references', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'trellis-refs-'));
+  init({ repoRoot: tmp, profile: 'backend', preset: 'standard' });
+  const dir = path.join(tmp, 'capabilities', 'refs-cap');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'contract.yaml'), [
+    'id: refs-cap', 'title: T', 'version: 1.0.0', 'status: active',
+    'intent: { description: x }',
+    'responsibility: { does: [x], does_not: [y] }',
+    'inputs: { a: { type: string } }', 'outputs: { b: { type: string } }',
+    'examples:',
+    '  - { name: ok, input: { a: x }, expected: { b: y } }',
+    '  - { name: boom, input: { a: "" }, expected_error: { code: BAD } }',
+    'budgets: { max_files: 5 }',
+    'verification: { contract: required }',
+    'evidence: [source-nope]',
+    'decisions: [ADR-9999]', ''
+  ].join('\n'));
+  const report = audit(tmp);
+  assert.equal(report.summary.brokenEvidenceLinks, 1);
+  assert.equal(report.summary.brokenDecisionLinks, 1);
+  const byId = Object.fromEntries(report.gates.map((g) => [g.id, g]));
+  assert.equal(byId.evidence.status, 'failed');
+  assert.equal(byId.decision.status, 'failed');
+});

@@ -91,12 +91,13 @@ const commands = {
     for (const dir of dirs) {
       const b = budgetCheck(dir, { repoRoot });
       const head = b.ok ? ok(b.id) : bad(b.id);
-      console.log(`${head} ${dim(`(measured via ${b.mode})`)}`);
+      console.log(`${head} ${dim(`(files via ${b.mode}, deps via ${b.depsSource})`)}`);
       for (const ck of b.checks) {
         const val = ck.measurable ? `${ck.measured}/${ck.limit}` : `${dim('declared-only')} (limit ${ck.limit})`;
         const mark = !ck.measurable ? dim('·') : ck.ok ? green('✓') : red('✗');
         console.log(`   ${mark} ${ck.budget.replace(/^max_/, '')}: ${val}`);
       }
+      if (b.externalImports.length) console.log(dim(`   imports: ${b.externalImports.join(', ')}`));
       violations += b.violations.length ? 1 : 0;
     }
     console.log('');
@@ -116,16 +117,25 @@ const commands = {
     line('Budget violations', s.budgetViolations, s.budgetViolations === 0);
     line('Missing error scenario', s.missingErrorScenario, s.missingErrorScenario === 0);
     line('Overdue reviews', s.overdueReviews, s.overdueReviews === 0);
+    line('Broken evidence links', s.brokenEvidenceLinks, s.brokenEvidenceLinks === 0);
+    line('Broken decision links', s.brokenDecisionLinks, s.brokenDecisionLinks === 0);
     line('Extension issues', s.extensionIssues, s.extensionIssues === 0);
+    for (const issue of report.references.evidenceIssues) console.log(`     ${yellow('evidence')} ${issue}`);
+    for (const issue of report.references.decisionIssues) console.log(`     ${yellow('decision')} ${issue}`);
     console.log('');
     console.log(bold('Gates'));
     for (const g of report.gates) {
+      if (g.status === 'not-evaluated') {
+        console.log('  ' + dim(`· ${g.id} - not evaluated (no check wired yet)`));
+        continue;
+      }
       const tag = g.enforced ? '' : dim(' (advisory)');
       const label = `${g.id}${tag}`;
-      console.log('  ' + (g.passed ? ok(label) : (g.enforced ? bad(label) : warn(label))) + (g.failingCount ? dim(`  ${g.failingCount} finding(s)`) : ''));
+      console.log('  ' + (g.status === 'passed' ? ok(label) : (g.enforced ? bad(label) : warn(label))) + (g.failingCount ? dim(`  ${g.failingCount} finding(s)`) : ''));
     }
     console.log('');
     console.log(report.ok ? green(bold('PASS - no enforced gate failures')) : red(bold(`FAIL - ${s.enforcedGateFailures} enforced gate(s) failing`)));
+    if (s.gatesNotEvaluated) console.log(dim(`${s.gatesNotEvaluated} declared gate(s) have no wired check yet and were not evaluated.`));
     console.log('');
     process.exitCode = report.ok ? 0 : 1;
   },

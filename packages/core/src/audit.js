@@ -1,5 +1,9 @@
 // Whole-repository audit. Discovers capabilities, validates contracts, runs budget checks,
-// checks ADR/source review freshness, runs extension completeness, and maps results to quality gates.
+// checks ADR/source review freshness and reference integrity, runs extension completeness,
+// and maps results to quality gates.
+//
+// Gate honesty: a declared gate that has no wired check is reported as `not-evaluated`,
+// never as silently passed. Only a measured, failing, enforced gate fails the build.
 import { fs, path, walkFiles } from './util.js';
 import { readYaml, extractYamlBlock } from './yaml.js';
 import { validateContract } from './contract.js';
@@ -20,27 +24,69 @@ function findCapabilityDirs(repoRoot, capsDir) {
     .filter((d) => fs.existsSync(path.join(d, 'contract.yaml')));
 }
 
-function checkReviewFreshness(repoRoot, today = new Date()) {
-  const overdue = [];
-  const decisionsDir = path.join(repoRoot, 'tech', 'decisions');
-  for (const file of walkFiles(decisionsDir)) {
+function collectAdrs(repoRoot) {
+  const ids = new Set();
+  const adrs = [];
+  const dir = path.join(repoRoot, 'tech', 'decisions');
+  for (const file of walkFiles(dir)) {
     if (!file.endsWith('.md')) continue;
     const doc = extractYamlBlock(fs.readFileSync(file, 'utf8'));
-    const next = doc?.review?.next_review;
-    if (next && new Date(next) < today) overdue.push({ kind: 'ADR', id: doc.id || path.basename(file), next_review: next });
+    if (doc?.id) { ids.add(doc.id); adrs.push({ id: doc.id, doc, file }); }
   }
+  return { ids, adrs };
+}
+
+function loadSources(repoRoot) {
   const bib = path.join(repoRoot, 'sources', 'bibliography.yaml');
-  if (fs.existsSync(bib)) {
-    const sources = readYaml(bib)?.sources || [];
-    for (const s of sources) {
-      if (s.next_review && new Date(s.next_review) < today) overdue.push({ kind: 'source', id: s.id, next_review: s.next_review });
-    }
+  return fs.existsSync(bib) ? (readYaml(bib)?.sources || []) : [];
+}
+
+function checkReviewFreshness(adrs, sources, today) {
+  const overdue = [];
+  for (const { id, doc } of adrs) {
+    const next = doc?.review?.next_review;
+    if (next && new Date(next) < today) overdue.push({ kind: 'ADR', id, next_review: next });
+  }
+  for (const s of sources) {
+    if (s.next_review && new Date(s.next_review) < today) overdue.push({ kind: 'source', id: s.id, next_review: s.next_review });
   }
   return overdue;
 }
 
+// Evidence graph integrity: every reference must resolve.
+// ADR evidence ids -> bibliography; capability evidence -> bibliography;
+// capability decisions -> ADR ids; source supports -> ADR id or capability id.
+function checkReferences(capabilities, adrInfo, sources) {
+  const evidenceIssues = [];
+  const decisionIssues = [];
+  const sourceIds = new Set(sources.map((s) => s.id));
+  const capIds = new Set(capabilities.map((c) => c.id));
+
+  for (const { id, doc } of adrInfo.adrs) {
+    for (const ev of doc.evidence || []) {
+      if (ev?.id && !sourceIds.has(ev.id)) evidenceIssues.push(`${id} cites unknown source "${ev.id}"`);
+    }
+  }
+  for (const c of capabilities) {
+    for (const ev of c.evidence) {
+      if (!sourceIds.has(ev)) evidenceIssues.push(`${c.id} cites unknown source "${ev}"`);
+    }
+    for (const d of c.decisions) {
+      if (!adrInfo.ids.has(d)) decisionIssues.push(`${c.id} references unknown decision "${d}"`);
+    }
+  }
+  for (const s of sources) {
+    for (const target of s.supports || []) {
+      const t = String(target);
+      const resolves = adrInfo.ids.has(t) || capIds.has(t) || capIds.has(t.replace(/^capability-/, ''));
+      if (!resolves) evidenceIssues.push(`${s.id} supports unknown target "${t}"`);
+    }
+  }
+  return { evidenceIssues, decisionIssues };
+}
+
 /**
- * @returns {{ summary, capabilities, reviews, extensions, gates, ok }}
+ * @returns {{ summary, capabilities, reviews, references, extensions, gates, ok, config }}
  */
 export function audit(repoRoot, { now } = {}) {
   repoRoot = path.resolve(repoRoot || process.cwd());
@@ -61,34 +107,44 @@ export function audit(repoRoot, { now } = {}) {
       warnings: validation.warnings,
       budgetOk: budget.ok,
       budgetViolations: budget.violations,
-      budgetChecks: budget.checks
+      budgetChecks: budget.checks,
+      evidence: Array.isArray(contract.evidence) ? contract.evidence : [],
+      decisions: Array.isArray(contract.decisions) ? contract.decisions : []
     });
   }
 
-  const reviews = checkReviewFreshness(repoRoot, now ? new Date(now) : new Date());
+  const adrInfo = collectAdrs(repoRoot);
+  const sources = loadSources(repoRoot);
+  const reviews = checkReviewFreshness(adrInfo.adrs, sources, now ? new Date(now) : new Date());
+  const references = checkReferences(capabilities, adrInfo, sources);
   const extensions = validateExtensions(repoRoot);
 
   const contractViolations = capabilities.filter((c) => !c.contractOk).length;
   const budgetViolations = capabilities.filter((c) => !c.budgetOk).length;
   const missingErrorScenario = capabilities.filter((c) => c.warnings.some((w) => w.includes('error scenario'))).length;
 
-  // Map findings to gates declared in quality/quality-gates.yaml (if present).
-  const gatesPath = path.join(repoRoot, 'quality', 'quality-gates.yaml');
-  const declaredGates = fs.existsSync(gatesPath) ? (readYaml(gatesPath)?.gates || []) : [];
+  // Findings per gate id. A gate id absent from this map has no wired check yet
+  // and is reported as not-evaluated.
   const findings = {
     contract: contractViolations,
     example: missingErrorScenario,
     budget: budgetViolations,
     'extension-completeness': extensions.results.filter((r) => !r.ok).length,
-    'review-freshness': reviews.length
+    'review-freshness': reviews.length,
+    evidence: references.evidenceIssues.length,
+    decision: references.decisionIssues.length
   };
+
+  const gatesPath = path.join(repoRoot, 'quality', 'quality-gates.yaml');
+  const declaredGates = fs.existsSync(gatesPath) ? (readYaml(gatesPath)?.gates || []) : [];
   const gates = declaredGates.map((g) => {
-    const count = findings[g.id] ?? 0;
-    const failed = count > 0 && (g.id in findings);
-    return { id: g.id, enforced: !!g.enforced, severity: g.severity || 'error', failingCount: count, passed: !failed };
+    const measured = g.id in findings;
+    const failingCount = measured ? findings[g.id] : 0;
+    const status = !measured ? 'not-evaluated' : (failingCount > 0 ? 'failed' : 'passed');
+    return { id: g.id, enforced: !!g.enforced, severity: g.severity || 'error', failingCount, status, passed: status === 'passed' };
   });
 
-  const enforcedFailures = gates.filter((g) => g.enforced && !g.passed);
+  const enforcedFailures = gates.filter((g) => g.enforced && g.status === 'failed');
 
   const summary = {
     capabilities: capabilities.length,
@@ -97,9 +153,12 @@ export function audit(repoRoot, { now } = {}) {
     budgetViolations,
     missingErrorScenario,
     overdueReviews: reviews.length,
+    brokenEvidenceLinks: references.evidenceIssues.length,
+    brokenDecisionLinks: references.decisionIssues.length,
     extensionIssues: findings['extension-completeness'],
+    gatesNotEvaluated: gates.filter((g) => g.status === 'not-evaluated').length,
     enforcedGateFailures: enforcedFailures.length
   };
 
-  return { summary, capabilities, reviews, extensions, gates, ok: enforcedFailures.length === 0, config };
+  return { summary, capabilities, reviews, references, extensions, gates, ok: enforcedFailures.length === 0, config };
 }

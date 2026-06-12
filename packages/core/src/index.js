@@ -1,7 +1,7 @@
 // Public API for @e-onux/trellis-core.
 // The CLI (and, in Phase 2, the web wizard) consume only what is re-exported here.
 export { validateContract } from './contract.js';
-export { budgetCheck } from './budgets.js';
+export { budgetCheck, scanImports } from './budgets.js';
 export { validateExtensions, findRegistries } from './extension.js';
 export { init, AGENT_FILES } from './scaffold.js';
 export { audit } from './audit.js';
