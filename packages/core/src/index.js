@@ -5,6 +5,8 @@ export { budgetCheck, scanImports } from './budgets.js';
 export { validateExtensions, findRegistries } from './extension.js';
 export { init, AGENT_FILES } from './scaffold.js';
 export { audit } from './audit.js';
+export { buildEvidenceGraph, NODE_TYPES, EDGE_KINDS } from './graph.js';
+export { loadEvidenceModel, loadEvidenceGraph } from './evidence.js';
 export { parseYaml, stringifyYaml, readYaml, extractYamlBlock } from './yaml.js';
 export { findStandardDir } from './util.js';
 
