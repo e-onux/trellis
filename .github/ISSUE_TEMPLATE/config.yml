@@ -4,5 +4,5 @@ contact_links:
     url: https://github.com/e-onux/trellis/discussions
     about: For "would this fit my workflow?" questions, adoption stories and open-ended feedback.
   - name: Try the wizard
-    url: https://trellis.sidre.site
+    url: https://vibecodegovern.com
     about: Generate a tailored bootstrap, npx command or starter zip in the browser.

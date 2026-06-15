@@ -116,7 +116,7 @@ export function trellisConfigToYaml(config) {
 /** The npx command that reproduces a given wizard selection. */
 export function composeNpxCommand({ profile, preset, agents }) {
   const a = (agents && agents.length) ? ` --agents ${agents.join(',')}` : '';
-  return `npx @e-onux/trellis init --profile ${profile} --preset ${preset}${a}`;
+  return `npx @sidrelabs/trellis init --profile ${profile} --preset ${preset}${a}`;
 }
 
 const ENABLED = (m, k) => m && m[k] !== false;

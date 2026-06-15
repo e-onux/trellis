@@ -18,7 +18,7 @@ The bare framework: the standard plus the toolchain, nothing else.
 - `packages/cli/` - the thin `trellis` Node command that wraps core.
 - `examples/` - a fully worked capability (`calculate-shipping-cost`) used by `npm run selfcheck`.
 
-The website (landing + wizard, trellis.sidre.site) is maintained in a separate workspace outside this
+The website (landing + wizard, vibecodegovern.com) is maintained in a separate workspace outside this
 repository; it consumes `packages/core/src/compose.js` and `standard/` from a checkout of this repo
 (see ADR-0003). Marketing material lives outside the repository entirely.
 

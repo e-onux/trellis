@@ -30,7 +30,7 @@ Then tell Copilot (agent mode):
 **Option B - CLI (deterministic).**
 
 ```bash
-npx @e-onux/trellis init --profile backend --preset standard --agents copilot,claude
+npx @sidrelabs/trellis init --profile backend --preset standard --agents copilot,claude
 # or, inside this monorepo:
 node packages/cli/bin/trellis.js init --profile backend --preset standard --agents copilot
 ```
@@ -58,10 +58,10 @@ The pointer defers to `AGENTS.md`, which carries the rules and references `TRELL
 ## Verify with the CLI
 
 ```bash
-npx @e-onux/trellis validate            # contract structure + budgets
-npx @e-onux/trellis budget-check        # files / LOC / dependencies vs budgets
-npx @e-onux/trellis extension validate  # required registration points
-npx @e-onux/trellis audit               # whole-repo health, CI-friendly exit code
+npx @sidrelabs/trellis validate            # contract structure + budgets
+npx @sidrelabs/trellis budget-check        # files / LOC / dependencies vs budgets
+npx @sidrelabs/trellis extension validate  # required registration points
+npx @sidrelabs/trellis audit               # whole-repo health, CI-friendly exit code
 ```
 
 See also: [getting started](../getting-started.md) · [Claude Code](./claude-code.md) · [Codex](./codex.md)

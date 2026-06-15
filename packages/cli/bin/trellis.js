@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// Trellis CLI. Thin wrapper over @e-onux/trellis-core. ESM, zero non-core dependencies.
+// Trellis CLI. Thin wrapper over @sidrelabs/trellis-core. ESM, zero non-core dependencies.
 import fs from 'node:fs';
 import path from 'node:path';
 import {
   init, audit, validateContract, budgetCheck, validateExtensions,
   readYaml, findStandardDir, loadEvidenceGraph, renderGraphHtml, renderObsidianVault, PROFILES, PRESETS
-} from '@e-onux/trellis-core';
+} from '@sidrelabs/trellis-core';
 
 // ---- tiny ANSI helpers (no dependency) ---------------------------------------------------------
 const useColor = process.stdout.isTTY && !process.env.NO_COLOR;

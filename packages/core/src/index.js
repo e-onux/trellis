@@ -1,4 +1,4 @@
-// Public API for @e-onux/trellis-core.
+// Public API for @sidrelabs/trellis-core.
 // The CLI (and, in Phase 2, the web wizard) consume only what is re-exported here.
 export { validateContract } from './contract.js';
 export { budgetCheck, scanImports } from './budgets.js';

@@ -23,7 +23,7 @@ npm install
 node packages/cli/bin/trellis.js --help
 ```
 
-In a target project (after publish: `npx @e-onux/trellis ...`):
+In a target project (after publish: `npx @sidrelabs/trellis ...`):
 
 ```bash
 trellis init --profile backend --preset standard --agents claude,codex,copilot

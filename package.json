@@ -5,7 +5,7 @@
   "description": "Trellis - a capability-first, evidence-governed standard that keeps AI-generated software understandable, testable and maintainable as it grows.",
   "type": "module",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/e-onux/trellis",
+  "homepage": "https://vibecodegovern.com",
   "repository": {
     "type": "git",
     "url": "https://github.com/e-onux/trellis.git"
