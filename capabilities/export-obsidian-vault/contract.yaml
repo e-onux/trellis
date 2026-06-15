@@ -1,0 +1,100 @@
+id: export-obsidian-vault
+title: Export the evidence graph as an Obsidian vault
+owner: toolchain
+version: 0.1.0
+status: active
+
+intent:
+  description: >
+    Render the evidence graph (the Source -> Decision -> Capability provenance built by
+    build-evidence-graph) as a flat set of Obsidian Markdown notes - one note per node plus a
+    map-of-content index - so the same graph the audit verifies and the HTML viewer renders can be
+    browsed, linked and back-linked in a knowledge vault. Pure and deterministic: it shapes text
+    only, it does not read or write the filesystem.
+
+responsibility:
+  does:
+    - emit one Markdown note per node with YAML frontmatter, a heading and trellis tags
+    - link outgoing edges as Obsidian wikilinks grouped under Cites / Governed by, and back-link incoming edges under Referenced by
+    - emit a `_evidence-graph.md` map-of-content with a stats summary and links to every node
+    - list dangling references in the index as plain text, never as resolving wikilinks
+  does_not:
+    - read or write any file (it returns { path, content } pairs for a caller to persist)
+    - build or mutate the graph (it consumes the output of build-evidence-graph unchanged)
+    - fail on dangling references (that is the audit's evidence gate)
+
+inputs:
+  graph:
+    type: object
+    required: true
+    description: A built evidence graph { nodes, edges, dangling, stats } as produced by buildEvidenceGraph.
+  options:
+    type: object
+    required: false
+    description: "{ now } - reserved for timestamping; output is stable across runs for a given graph."
+
+outputs:
+  files:
+    type: array
+    description: An array of { path, content }, where path is a vault-relative POSIX path and content is full Markdown.
+
+examples:
+  - name: A capability note links its governing decision and cited source
+    input:
+      graph:
+        nodes:
+          - { id: source-a, type: source, title: A study }
+          - { id: ADR-0001, type: decision, title: Record decisions }
+          - { id: cap-x, type: capability, title: Do the thing }
+        edges:
+          - { from: cap-x, to: ADR-0001, kind: governed-by }
+          - { from: cap-x, to: source-a, kind: cites }
+        dangling: []
+        stats: { sources: 1, decisions: 1, capabilities: 1, nodes: 3, edges: 3, dangling: 0 }
+    expected:
+      files: 4
+  - name: A dangling reference is listed in the index but never linked
+    input:
+      graph:
+        nodes:
+          - { id: cap-x, type: capability, title: Do the thing }
+        edges: []
+        dangling:
+          - { from: cap-x, to: source-missing, kind: cites }
+        stats: { sources: 0, decisions: 0, capabilities: 1, nodes: 1, edges: 0, dangling: 1 }
+    expected_error:
+      code: DANGLING_REFERENCE
+
+invariants:
+  - one note is emitted per node, foldered by type (sources/ | decisions/ | capabilities/)
+  - the returned array is sorted by path, so output is byte-stable for a given graph
+  - every wikilink target is a real node; dangling references are rendered as plain text only
+
+dependencies:
+  internal: []
+  external: []
+
+implementation:
+  - packages/core/src/obsidian-vault.js
+
+budgets:
+  max_files: 1
+  max_lines_of_code: 160
+  max_direct_dependencies: 0
+  max_public_operations: 3
+  max_change_reasons: 1
+
+verification:
+  unit: required
+  contract: required
+  regression: required
+
+review:
+  interval: 6 months
+  triggers:
+    - the evidence graph gains a new node or edge type
+    - the Obsidian note or frontmatter conventions change
+
+evidence: []
+decisions:
+  - ADR-0004

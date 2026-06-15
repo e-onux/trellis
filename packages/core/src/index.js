@@ -8,6 +8,7 @@ export { audit } from './audit.js';
 export { buildEvidenceGraph, NODE_TYPES, EDGE_KINDS } from './graph.js';
 export { loadEvidenceModel, loadEvidenceGraph } from './evidence.js';
 export { renderGraphHtml } from './graph-html.js';
+export { renderObsidianVault } from './obsidian-vault.js';
 export { parseYaml, stringifyYaml, readYaml, extractYamlBlock } from './yaml.js';
 export { findStandardDir } from './util.js';
 
