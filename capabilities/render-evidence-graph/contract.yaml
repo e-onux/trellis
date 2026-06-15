@@ -1,0 +1,82 @@
+id: render-evidence-graph
+title: Render the evidence graph as a standalone viewer
+owner: toolchain
+version: 0.1.0
+status: active
+
+intent:
+  description: >
+    Turn the normalized evidence graph into one self-contained HTML document - inline CSS, vanilla
+    JS and the graph embedded as JSON - that opens offline in any browser with no server, no CDN and
+    no graph library (ADR-0004). The viewer lays sources, decisions and capabilities into columns and
+    lets a reader hover to highlight a node's links, filter by type, and click a node to inspect it.
+
+responsibility:
+  does:
+    - render the { nodes, edges } graph as a single HTML string
+    - embed the graph as JSON and draw it client-side with hover / filter / inspect interactions
+  does_not:
+    - load the repository (build-evidence-graph does that)
+    - depend on a server, a network, or any third-party graph library
+
+inputs:
+  graph:
+    type: object
+    required: true
+    description: A { nodes, edges, dangling, stats } graph from build-evidence-graph.
+
+outputs:
+  html:
+    type: string
+    description: A complete standalone HTML document.
+
+examples:
+  - name: A graph renders to a self-contained document with embedded data
+    input:
+      graph:
+        nodes:
+          - { id: ADR-1, type: decision, title: A decision }
+        edges: []
+    expected:
+      contains: "var DATA="
+  - name: An empty graph renders the empty-state notice instead of a canvas
+    input:
+      graph:
+        nodes: []
+        edges: []
+    expected_error:
+      code: EMPTY_GRAPH
+
+invariants:
+  - the output is a single file with no external resource references
+  - the embedded JSON escapes characters that could break the script context
+
+dependencies:
+  internal:
+    - build-evidence-graph
+  external: []
+
+implementation:
+  - packages/core/src/graph-html.js
+
+budgets:
+  max_files: 1
+  max_lines_of_code: 200
+  max_direct_dependencies: 0
+  max_public_operations: 2
+  max_change_reasons: 1
+
+verification:
+  unit: required
+  contract: required
+  regression: required
+
+review:
+  interval: 6 months
+  triggers:
+    - the graph gains a node or edge type the viewer must show
+    - a graph library becomes a justified dependency (see ADR-0004)
+
+evidence: []
+decisions:
+  - ADR-0004
