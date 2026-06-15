@@ -72,9 +72,19 @@ The repository itself dogfoods this: see [`AGENTS.md`](./AGENTS.md), [`CLAUDE.md
 
 ## Quickstart
 
-There are two ways to adopt Trellis. Both produce the same governed structure.
+There are three ways to adopt Trellis. All produce the same governed structure.
 
-### Option A - Agent-native (zero install) ⭐
+### Option A0 - Single prompt (truly zero-touch) ⭐⭐
+
+Paste one prompt into your agent — no files to download, no wizard to visit:
+
+> "Fetch https://raw.githubusercontent.com/e-onux/trellis/main/INSTALL.md and follow its instructions."
+
+The agent fetches [`INSTALL.md`](./INSTALL.md), analyzes your project, downloads and applies
+`TRELLIS.md`, scaffolds governance, and discards the install file when done. Your project ends up
+with only the governed structure — no installation artifacts.
+
+### Option A - Agent-native (one curl) ⭐
 
 Copy the bootstrap manifesto into your repo and tell your agent to follow it:
 
