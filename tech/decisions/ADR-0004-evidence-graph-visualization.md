@@ -1,61 +1,61 @@
-# ADR-0004: Ship an own evidence-graph viewer; support Obsidian, don't depend on it
+# ADR-0004: Expose the evidence graph as data in core; keep the viewer a separate tool
 
 ```yaml
 id: ADR-0004
-title: Ship an own evidence-graph viewer; support Obsidian, don't depend on it
+title: Expose the evidence graph as data in core; keep the viewer a separate tool (Trelliscope)
 status: accepted
-date: 2026-06-14
+date: 2026-06-15
 
 context:
   description: >
     The evidence graph (Source -> Decision -> Capability) existed only as YAML id references that
-    `trellis audit` validates for integrity. It was real but invisible: nobody could see or navigate
-    it, which is exactly the human-verifiable surface Phase 2 calls for. Obsidian renders any folder
-    of Markdown with [[wikilinks]] as an interactive graph, and a Trellis repo is already Markdown +
-    YAML - so it is tempting to lean on Obsidian as "the viewer". But Obsidian is a proprietary GUI
-    app: it does not run in CI, is not agent-facing, and would contradict the open, agent-independent,
-    deterministic-toolchain identity of the standard.
+    `trellis audit` validates - real but invisible. A viewer (a self-contained HTML app plus an
+    Obsidian-compatible vault export) was first built inside this repository, but that puts
+    application / UI code into the bare standard repo, against the ADR-0003 principle that this repo
+    stays the standard + toolchain and nothing else. A renderer that "reads your repository" living
+    inside the standard can also make users uneasy, even though it reads strictly less than the
+    audit already does.
 
 decision:
   selected: >
-    Generate an own, dependency-free, self-contained HTML viewer from the evidence graph as the
-    primary surface - one file, no CDN, no server, works offline in any repo. Additionally emit an
-    Obsidian-compatible vault (one Markdown note per node with [[wikilinks]] plus a map-of-content
-    index) so teams that already use Obsidian get its graph view for free. Both are generated
-    artifacts; the governed YAML/Markdown stays the single source of truth. Trellis takes no runtime
-    or build dependency on Obsidian or on any graph library.
+    Split the concern. `@sidrelabs/trellis-core` exposes the evidence graph as DATA - loadEvidenceGraph
+    / buildEvidenceGraph, the build-evidence-graph capability - reading only the governance files
+    (sources, ADRs, capability contracts), locally, with no network and no telemetry. Rendering and
+    navigation (the HTML viewer, the Obsidian vault export, the CLI) live in a SEPARATE repository and
+    npm package, Trelliscope (@sidrelabs/trelliscope), which depends on @sidrelabs/trellis-core. The
+    standard repo stays bare; Trellis supports Obsidian without depending on it (Trelliscope writes the
+    vault). The governed Markdown/YAML remains the single source of truth.
 
 alternatives:
+  - Keep the viewer inside this repo (rejected - app/UI in the bare standard, contradicts ADR-0003)
   - Use Obsidian itself as the viewer (rejected - proprietary GUI, not CI/agent-friendly, a dependency)
-  - Build a separate web app like the wizard (rejected - heavier, not embeddable per-repo, needs hosting)
-  - Pull in d3 / cytoscape via CDN (rejected - breaks offline use and the zero-dependency core rule)
+  - Duplicate the evidence-graph loader inside Trelliscope (rejected - it would drift from what `audit` validates)
 
 assumptions:
-  - The standard's Markdown/YAML remains the source of truth; both outputs are regenerable views.
-  - The viewer needs no server or network; a single HTML file is enough for the current graph sizes.
-  - Obsidian stays an optional convenience, never a requirement to read the graph.
+  - The governed YAML/Markdown stays the source of truth; the graph is regenerable data.
+  - The graph data API is local-only - no network, no telemetry - so it is no more sensitive than `audit`.
+  - Trelliscope consumes @sidrelabs/trellis-core rather than re-reading the repo format itself.
 
 consequences:
   positive:
-    - The evidence graph becomes navigable by non-engineers in any repo, with zero install.
-    - Obsidian users get a richer, backlinked graph view at no extra cost.
-    - Advances the Phase 2 human-verifiable surface without waiting on the full test cockpit.
+    - The standard repository stays bare - it ships the graph as data, not an application.
+    - One source of truth for the graph (reused by Trelliscope, CI, dashboards); it cannot drift from the audit.
+    - The viewer can evolve as a product (its own releases) without touching the standard.
+    - Obsidian is supported without Trellis depending on it.
   negative:
-    - We now maintain a small amount of graph-layout code in the viewer.
-    - The Obsidian vault is a generated view that goes stale if not regenerated after changes.
+    - A cross-repo dependency from Trelliscope to @sidrelabs/trellis-core (a local path until core is published).
+    - The graph data API has no in-repo consumer; only external tools use it.
 
 review:
   interval: 12 months
-  next_review: 2027-06-14
+  next_review: 2027-06-15
   triggers:
-    - a graph library becomes a justified dependency (revisit the hand-rolled layout)
-    - the Phase 3 test cockpit subsumes the standalone viewer
-    - Obsidian changes its wikilink or graph-view format
+    - the toolchain itself needs to render the graph (reconsider co-locating a renderer)
+    - the graph data API gains any network behaviour (it must stay local-only)
+    - the Trelliscope and core graph shapes diverge
 
 affected_capabilities:
   - build-evidence-graph
-  - render-evidence-graph
-  - export-obsidian-vault
 
 migration:
   required: false
@@ -66,5 +66,6 @@ rollback:
 
 ## Notes
 
-The viewer and the Obsidian export read the same normalized graph from `build-evidence-graph`, so
-the two surfaces can never disagree about what the evidence graph contains.
+Trelliscope and any other consumer read one normalized graph from `build-evidence-graph`, so a viewer
+can never disagree with what `trellis audit` validates. The data layer reads only the governance files
+and never phones home - the trust boundary that matters is kept simple.

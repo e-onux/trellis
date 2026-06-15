@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   init, audit, validateContract, budgetCheck, validateExtensions,
-  readYaml, findStandardDir, loadEvidenceGraph, renderGraphHtml, renderObsidianVault, PROFILES, PRESETS
+  readYaml, findStandardDir, PROFILES, PRESETS
 } from '@sidrelabs/trellis-core';
 
 // ---- tiny ANSI helpers (no dependency) ---------------------------------------------------------
@@ -140,42 +140,6 @@ const commands = {
     process.exitCode = report.ok ? 0 : 1;
   },
 
-  graph(flags) {
-    const repoRoot = rootOf(flags);
-    const format = (flags.format || 'html').toLowerCase();
-    const graph = loadEvidenceGraph(repoRoot);
-    if (format === 'json') {
-      const json = JSON.stringify(graph, null, 2);
-      if (flags.out) {
-        const out = path.resolve(flags.out);
-        fs.writeFileSync(out, json + '\n');
-        console.log(ok(`Graph JSON → ${path.relative(process.cwd(), out)}`));
-      } else console.log(json);
-      return;
-    }
-    if (format === 'html') {
-      const out = path.resolve(flags.out || 'trellis-graph.html');
-      fs.writeFileSync(out, renderGraphHtml(graph));
-      console.log(ok(`Evidence graph → ${path.relative(process.cwd(), out)}`) + dim(`  ${graph.stats.nodes} nodes, ${graph.stats.edges} links`));
-      if (graph.dangling.length) console.log(warn(`${graph.dangling.length} dangling reference(s); run trellis audit`));
-      console.log(dim('Open it in any browser - it is fully self-contained (no server, no network).'));
-      return;
-    }
-    if (format === 'obsidian') {
-      const outDir = path.resolve(flags.out || 'evidence-vault');
-      const notes = renderObsidianVault(graph);
-      for (const note of notes) {
-        const dest = path.join(outDir, note.path);
-        fs.mkdirSync(path.dirname(dest), { recursive: true });
-        fs.writeFileSync(dest, note.content);
-      }
-      console.log(ok(`Obsidian vault → ${path.relative(process.cwd(), outDir)}/`) + dim(`  ${notes.length} notes`));
-      console.log(dim('Open the folder as an Obsidian vault; the graph view shows the evidence graph.'));
-      return;
-    }
-    fail(`Unknown --format "${format}". Choose: html, json, obsidian`);
-  },
-
   extension(flags, positional) {
     const sub = positional[0];
     if (sub !== 'validate') fail(`Unknown extension subcommand "${sub || ''}". Try: trellis extension validate [id]`);
@@ -263,7 +227,6 @@ ${bold('Commands')}
   ${cyan('validate')}             Validate capability contracts (+ budgets)   ${dim('[--capability --root <dir>]')}
   ${cyan('budget-check')}         Check capability size/dependency budgets     ${dim('[--capability --root <dir>]')}
   ${cyan('audit')}                Whole-repo health report + quality gates     ${dim('[--json --root <dir>]')}
-  ${cyan('graph')}                Render the evidence graph (HTML viewer or Obsidian vault)  ${dim('[--format html|json|obsidian --out <path> --root <dir>]')}
   ${cyan('extension validate')}   Check extension registration completeness    ${dim('[<id> --root <dir>]')}
   ${cyan('capability add')}       Scaffold a new capability                    ${dim('<id> [--root <dir>]')}
   ${cyan('help')} | ${cyan('version')}

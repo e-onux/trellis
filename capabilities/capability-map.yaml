@@ -31,13 +31,3 @@ capabilities:
     owner: toolchain
     path: capabilities/build-evidence-graph
     depends_on: []
-  - id: render-evidence-graph
-    status: active
-    owner: toolchain
-    path: capabilities/render-evidence-graph
-    depends_on: [build-evidence-graph]
-  - id: export-obsidian-vault
-    status: active
-    owner: toolchain
-    path: capabilities/export-obsidian-vault
-    depends_on: [build-evidence-graph]

@@ -12,7 +12,9 @@ graph.
   fails the build on these; this capability only surfaces them).
 
 The shaping (`buildEvidenceGraph`) is pure and browser-safe; the loader (`loadEvidenceGraph`) reads
-the repository from disk. Both the HTML viewer (`render-evidence-graph`) and the Obsidian export
-(`export-obsidian-vault`) consume this one graph, so the surfaces can never disagree.
+the repository from disk. This is the **data layer only** - rendering and navigation live in a
+separate tool ([Trelliscope](https://github.com/sidrelabs/trelliscope), `@sidrelabs/trelliscope`),
+which consumes this graph through `@sidrelabs/trellis-core`. Keeping the graph here as data means the
+viewer can never disagree with what `trellis audit` validates.
 
 See [ADR-0004](../../tech/decisions/ADR-0004-evidence-graph-visualization.md).

@@ -109,25 +109,22 @@ npx @sidrelabs/trellis validate          # contract + budget + drift checks
 npx @sidrelabs/trellis budget-check       # capability size/dependency budgets
 npx @sidrelabs/trellis audit              # whole-repo health report
 npx @sidrelabs/trellis extension validate # extension completeness gate
-npx @sidrelabs/trellis graph              # evidence-graph viewer (HTML) or Obsidian vault
 ```
 
 ## See the evidence graph
 
 The evidence graph (`Source → Decision → Capability`) is not just validated in CI - you can look at it.
+Trellis exposes it as **data** (`loadEvidenceGraph` in `@sidrelabs/trellis-core`); rendering lives in a
+separate tool so this repo stays bare (see [ADR-0004](./tech/decisions/ADR-0004-evidence-graph-visualization.md)):
+
+[**🔭 Trelliscope**](https://github.com/sidrelabs/trelliscope) (`@sidrelabs/trelliscope`) renders that
+graph as a self-contained HTML app or an Obsidian vault - supporting Obsidian without Trellis depending
+on it.
 
 ```bash
-trellis graph                       # writes trellis-graph.html (open it in any browser)
-trellis graph --format obsidian     # writes an Obsidian vault you can open as-is
-trellis graph --format json         # the raw { nodes, edges, dangling } graph
+npx @sidrelabs/trelliscope                     # -> trelliscope.html (open in any browser)
+npx @sidrelabs/trelliscope --format obsidian   # -> an Obsidian vault you can open as-is
 ```
-
-`trellis-graph.html` is **one self-contained file** - inline CSS, vanilla JS, no server, no CDN, no
-graph library. Sources, decisions and capabilities sit in columns; hover a node to highlight its
-links, filter by type, click to inspect it. The Obsidian export writes one Markdown note per node
-cross-linked with `[[wikilinks]]`, so opening the folder as an [Obsidian](./docs/integrations/obsidian.md)
-vault shows the same graph in Obsidian's graph view - Trellis supports Obsidian without depending on it
-(see [ADR-0004](./tech/decisions/ADR-0004-evidence-graph-visualization.md)).
 
 ## Progressive adoption
 
@@ -184,7 +181,7 @@ and CI runs `trellis audit --root .` on every push. A worked end-to-end example 
 - [Getting started](./docs/getting-started.md)
 - [How Trellis relates to other tools](./docs/comparison.md)
 - [Integration guides](./docs/integrations/claude-code.md): [Claude Code](./docs/integrations/claude-code.md) · [Codex](./docs/integrations/codex.md) · [Copilot](./docs/integrations/copilot.md) · [Cursor](./docs/integrations/cursor.md) · [Windsurf](./docs/integrations/windsurf.md) · [Gemini](./docs/integrations/gemini.md)
-- [Obsidian (evidence-graph viewer)](./docs/integrations/obsidian.md)
+- [Trelliscope - evidence-graph viewer](https://github.com/sidrelabs/trelliscope) (separate repo)
 - [Roadmap](./ROADMAP.md) · [Changelog](./CHANGELOG.md)
 
 ## Roadmap

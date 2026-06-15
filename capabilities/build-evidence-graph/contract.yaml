@@ -17,7 +17,7 @@ responsibility:
     - emit typed nodes and deduplicated cites / governed-by edges
     - report unresolved references as dangling
   does_not:
-    - render any output format (the HTML viewer and the Obsidian export consume this graph)
+    - render any output format (separate consumers such as the Trelliscope viewer do that)
     - fail the build on dangling references (that is the audit's evidence gate)
 
 inputs:

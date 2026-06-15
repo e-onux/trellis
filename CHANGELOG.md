@@ -2,11 +2,12 @@
 
 ## Unreleased
 
-- Evidence-graph visualization (ADR-0004): `trellis graph` renders the evidence graph as a
-  self-contained HTML viewer (one file, no server, no CDN, no graph library) or as an
-  Obsidian-compatible vault (`--format obsidian`) cross-linked with `[[wikilinks]]`. Trellis supports
-  Obsidian without depending on it. New capabilities: build-evidence-graph, render-evidence-graph,
-  export-obsidian-vault.
+- Evidence graph as data (ADR-0004): `@sidrelabs/trellis-core` now exposes the evidence graph via
+  `loadEvidenceGraph` / `buildEvidenceGraph` (the build-evidence-graph capability) - reading only the
+  governance files, locally, with no network. Rendering and navigation moved to a separate tool,
+  [Trelliscope](https://github.com/sidrelabs/trelliscope) (`@sidrelabs/trelliscope`), which renders a
+  self-contained HTML app or an Obsidian vault from that graph - so this repo stays the bare standard
+  and Trellis supports Obsidian without depending on it.
 - Rebrand: the npm scope moved to SidreLabs (`@sidrelabs/trellis`, `@sidrelabs/trellis-core`) and the
   category domain is now vibecodegovern.com. The GitHub repository (`e-onux/trellis`) is unchanged.
 - The website (landing + wizard) moved to a separate workspace outside this repository; the repo
