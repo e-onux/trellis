@@ -5,7 +5,7 @@
 - Evidence graph as data (ADR-0004): `@sidrelabs/trellis-core` now exposes the evidence graph via
   `loadEvidenceGraph` / `buildEvidenceGraph` (the build-evidence-graph capability) - reading only the
   governance files, locally, with no network. Rendering and navigation moved to a separate tool,
-  [Trelliscope](https://github.com/sidrelabs/trelliscope) (`@sidrelabs/trelliscope`), which renders a
+  [Trelliscope](https://github.com/e-onux/trelliscope) (`@sidrelabs/trelliscope`), which renders a
   self-contained HTML app or an Obsidian vault from that graph - so this repo stays the bare standard
   and Trellis supports Obsidian without depending on it.
 - Rebrand: the npm scope moved to SidreLabs (`@sidrelabs/trellis`, `@sidrelabs/trellis-core`) and the

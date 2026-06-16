@@ -117,7 +117,7 @@ The evidence graph (`Source → Decision → Capability`) is not just validated 
 Trellis exposes it as **data** (`loadEvidenceGraph` in `@sidrelabs/trellis-core`); rendering lives in a
 separate tool so this repo stays bare (see [ADR-0004](./tech/decisions/ADR-0004-evidence-graph-visualization.md)):
 
-[**🔭 Trelliscope**](https://github.com/sidrelabs/trelliscope) (`@sidrelabs/trelliscope`) renders that
+[**🔭 Trelliscope**](https://github.com/e-onux/trelliscope) (`@sidrelabs/trelliscope`) renders that
 graph as a self-contained HTML app or an Obsidian vault - supporting Obsidian without Trellis depending
 on it.
 
@@ -181,7 +181,7 @@ and CI runs `trellis audit --root .` on every push. A worked end-to-end example 
 - [Getting started](./docs/getting-started.md)
 - [How Trellis relates to other tools](./docs/comparison.md)
 - [Integration guides](./docs/integrations/claude-code.md): [Claude Code](./docs/integrations/claude-code.md) · [Codex](./docs/integrations/codex.md) · [Copilot](./docs/integrations/copilot.md) · [Cursor](./docs/integrations/cursor.md) · [Windsurf](./docs/integrations/windsurf.md) · [Gemini](./docs/integrations/gemini.md)
-- [Trelliscope - evidence-graph viewer](https://github.com/sidrelabs/trelliscope) (separate repo)
+- [Trelliscope - evidence-graph viewer](https://github.com/e-onux/trelliscope) (separate repo)
 - [Roadmap](./ROADMAP.md) · [Changelog](./CHANGELOG.md)
 
 ## Roadmap

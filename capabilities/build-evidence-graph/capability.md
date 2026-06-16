@@ -13,7 +13,7 @@ graph.
 
 The shaping (`buildEvidenceGraph`) is pure and browser-safe; the loader (`loadEvidenceGraph`) reads
 the repository from disk. This is the **data layer only** - rendering and navigation live in a
-separate tool ([Trelliscope](https://github.com/sidrelabs/trelliscope), `@sidrelabs/trelliscope`),
+separate tool ([Trelliscope](https://github.com/e-onux/trelliscope), `@sidrelabs/trelliscope`),
 which consumes this graph through `@sidrelabs/trellis-core`. Keeping the graph here as data means the
 viewer can never disagree with what `trellis audit` validates.
 
