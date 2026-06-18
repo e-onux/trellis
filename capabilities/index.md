@@ -10,6 +10,8 @@ runs against these in CI.
 | extension-completeness | active | toolchain | [contract.yaml](./extension-completeness/contract.yaml) |
 | repo-audit | active | toolchain | [contract.yaml](./repo-audit/contract.yaml) |
 | compose-artifacts | active | toolchain | [contract.yaml](./compose-artifacts/contract.yaml) |
+| build-evidence-graph | active | toolchain | [contract.yaml](./build-evidence-graph/contract.yaml) |
+| check-model-provenance | active | toolchain | [contract.yaml](./check-model-provenance/contract.yaml) |
 
 Budgets measure the real implementation files under `packages/core/src/` via each contract's
 `implementation:` list, including real import scanning.

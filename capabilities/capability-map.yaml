@@ -31,3 +31,8 @@ capabilities:
     owner: toolchain
     path: capabilities/build-evidence-graph
     depends_on: []
+  - id: check-model-provenance
+    status: active
+    owner: toolchain
+    path: capabilities/check-model-provenance
+    depends_on: []

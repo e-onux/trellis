@@ -39,6 +39,10 @@ gates:
     description: Previously-working capabilities still pass.
     enforced: true
     severity: error
+  - id: model-provenance
+    description: Every in-window commit was authored by an allow-listed model (run `trellis model-check`).
+    enforced: true
+    severity: error
   - id: review-freshness
     description: No ADR/source review is overdue.
     enforced: false

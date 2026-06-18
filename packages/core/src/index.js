@@ -7,6 +7,9 @@ export { init, AGENT_FILES } from './scaffold.js';
 export { audit } from './audit.js';
 export { buildEvidenceGraph, NODE_TYPES, EDGE_KINDS } from './graph.js';
 export { loadEvidenceModel, loadEvidenceGraph } from './evidence.js';
+export {
+  checkModelProvenance, classifyCommits, loadModelPolicy, readProvenance, stampProvenance, PROVENANCE_FILE
+} from './model-policy.js';
 export { parseYaml, stringifyYaml, readYaml, extractYamlBlock } from './yaml.js';
 export { findStandardDir } from './util.js';
 

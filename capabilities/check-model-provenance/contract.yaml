@@ -1,0 +1,87 @@
+id: check-model-provenance
+title: Check that commits were authored by an allow-listed model
+owner: toolchain
+version: 0.1.0
+status: active
+
+intent:
+  description: >
+    Govern which models may author code. Join the commits in the enforcement window with the
+    provenance recorded out-of-band in .trellis/provenance.jsonl, then classify each commit
+    against governance/model-policy.yaml. Fail-closed: a disallowed model - or, when provenance
+    is required, a commit with no recorded model - is a violation. The point is to stop a degraded
+    fallback model from silently shipping code.
+
+responsibility:
+  does:
+    - load the model policy (allow-list, block-list, enforcement window) and the provenance log
+    - classify each in-window commit as allowed, disallowed, unverified or exempt
+    - report violations so `trellis model-check` can block a merge before bad-model code lands
+  does_not:
+    - revert or modify any commit (blocking before merge is preferred to after-the-fact revert)
+    - prove authorship cryptographically (provenance is an attestation, like Signed-off-by)
+    - reach the network (reads only local files and `git log`)
+
+inputs:
+  repo_root:
+    type: string
+    required: true
+  since:
+    type: string
+    required: false
+
+outputs:
+  evaluated:
+    type: boolean
+  ok:
+    type: boolean
+  violations:
+    type: array
+
+examples:
+  - name: All in-window commits are stamped with an allowed model
+    input:
+      repo_root: ./governed-project
+    expected:
+      ok: true
+  - name: A commit authored by a disallowed (or unverified) model
+    input:
+      repo_root: ./project-with-fallback-commit
+    expected_error:
+      code: MODEL_POLICY_VIOLATION
+
+invariants:
+  - a commit with no recorded model fails when require_provenance is true (fail-closed)
+  - no policy file or not a git repository -> not evaluated, never a silent pass
+  - the check never writes to or rewrites the repository
+
+dependencies:
+  internal: []
+  external: []
+
+implementation:
+  - packages/core/src/model-policy.js
+
+budgets:
+  max_files: 1
+  max_lines_of_code: 170
+  max_direct_dependencies: 0
+  max_public_operations: 6
+  max_cyclomatic_complexity: 16
+  max_change_reasons: 1
+
+verification:
+  unit: required
+  contract: required
+  regression: required
+
+review:
+  interval: 12 months
+  triggers:
+    - a model can sign its output (revisit attestation vs proof)
+    - provenance storage moves (git notes, a different sidecar)
+    - the gate is wired into trellis audit
+
+evidence: []
+decisions:
+  - ADR-0005
