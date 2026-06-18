@@ -47,13 +47,13 @@ assumptions:
 
 consequences:
   positive:
-    - "Which model may author code" is now declarable and machine-checkable, with an audit trail.
+    - Which model may author code is now a declarable, machine-checkable axis with an audit trail.
     - Fail-closed blocking happens before merge, where it is cheap, not via destructive after-the-fact revert.
     - Commit messages stay clean - provenance lives out-of-band.
     - Obsidian-style external tools and CI can read the same provenance log; no network.
   negative:
     - Provenance depends on a stamping step being wired (a hook); without it, require_provenance
-      flags every commit as unverified, so adopters must install the hook or set enforcement: warn.
+      flags every commit as unverified, so adopters must install the hook or set warn enforcement.
     - The gate is not yet wired into `trellis audit` (which stays git-free); it runs as the separate
       `trellis model-check` command until a stamping hook lands (tracked in ROADMAP).
 
