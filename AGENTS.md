@@ -43,6 +43,10 @@ Read [`TRELLIS.md`](./TRELLIS.md) and [`standard/README.md`](./standard/README.m
 7. **Registration over convention** - update every required extension registration point.
 8. **Single source of truth** - never duplicate rules across adapter files.
 9. **Repository is the memory** - persist decisions/sources/contracts in the repo, not in chat.
+10. **Authorized models only** - [`governance/model-policy.yaml`](./governance/model-policy.yaml) lists the
+    models permitted to author code here. If you are not one of them - or you are a degraded/fallback
+    model - **STOP and tell the user to switch models; do not write code.** Authorship is verified
+    out-of-band (`trellis model-check`); a disallowed or unverified author fails the gate.
 
 ## Completion report
 
