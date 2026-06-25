@@ -13,7 +13,7 @@ test('detects an AWS access key id', () => {
 });
 
 test('detects a private key header and a GitHub token', () => {
-  assert.equal(detectSecrets('-----BEGIN OPENSSH PRIVATE KEY-----')[0].rule, 'private-key');
+  assert.equal(detectSecrets('-----BEGIN OPENSSH PRIVATE KEY-----')[0].rule, 'private-key'); // trellis-allow-secret
   assert.equal(detectSecrets('ghp_000000000000000000000000000000000000')[0].rule, 'github-token'); // trellis-allow-secret
 });
 
@@ -29,10 +29,11 @@ test('honors the inline allow marker', () => {
 });
 
 test('never leaks the secret itself - only rule, location and length', () => {
-  const f = detectSecrets('AKIAIOSFODNN7EXAMPLE', { filename: 'a.js' })[0]; // trellis-allow-secret
+  const token = 'AKIAIOSFODNN7EXAMPLE'; // trellis-allow-secret
+  const f = detectSecrets(token, { filename: 'a.js' })[0];
   assert.equal(f.length, '20 chars');
   assert.equal(f.file, 'a.js');
-  assert.ok(!JSON.stringify(f).includes('AKIAIOSFODNN7EXAMPLE'), 'finding must not contain the token');
+  assert.ok(!JSON.stringify(f).includes(token), 'finding must not contain the token');
 });
 
 test('scanSecrets: clean tree passes, a leaked file fails with its path', () => {

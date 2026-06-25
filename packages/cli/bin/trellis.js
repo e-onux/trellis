@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process';
 import {
   init, audit, validateContract, budgetCheck, validateExtensions,
   readYaml, findStandardDir, PROFILES, PRESETS,
-  checkModelProvenance, stampProvenance, PROVENANCE_FILE
+  checkModelProvenance, stampProvenance, PROVENANCE_FILE, scanSecrets
 } from '@sidrelabs/trellis-core';
 
 // ---- tiny ANSI helpers (no dependency) ---------------------------------------------------------
@@ -185,6 +185,26 @@ const commands = {
     console.log(ok(`Stamped ${commit.slice(0, 9)} → ${model}${agent ? ` (${agent})` : ''}`) + dim(`  in ${PROVENANCE_FILE}`));
   },
 
+  'secret-scan'(flags) {
+    const repoRoot = rootOf(flags);
+    const r = scanSecrets(repoRoot, { since: typeof flags.since === 'string' ? flags.since : undefined, staged: !!flags.staged });
+    if (flags.json) { console.log(JSON.stringify(r, null, 2)); process.exitCode = r.ok ? 0 : 1; return; }
+    console.log(bold(`\nSecret scan`) + dim(`  ${r.scanned} file(s) scanned\n`));
+    for (const f of r.findings) {
+      console.log('  ' + bad(`${f.file}:${f.line}`) + `  ${f.rule}` + dim(`  (${f.length})`));
+    }
+    console.log('');
+    if (r.ok) {
+      console.log(green(bold(`PASS - no committed secrets`)));
+      process.exitCode = 0;
+    } else {
+      console.log(red(bold(`FAIL - ${r.findings.length} potential secret(s) found`)));
+      console.log(dim(`Move it to env/secret store. Intentional fixture? add an inline 'trellis-allow-secret' comment.`));
+      process.exitCode = 1;
+    }
+    console.log('');
+  },
+
   extension(flags, positional) {
     const sub = positional[0];
     if (sub !== 'validate') fail(`Unknown extension subcommand "${sub || ''}". Try: trellis extension validate [id]`);
@@ -274,6 +294,7 @@ ${bold('Commands')}
   ${cyan('audit')}                Whole-repo health report + quality gates     ${dim('[--json --root <dir>]')}
   ${cyan('model-check')}          Verify commits were authored by an allowed model  ${dim('[--since <ref> --json --root <dir>]')}
   ${cyan('model-stamp')}          Record which model authored a commit         ${dim('--model <id> [--commit <ref> --agent <id>]')}
+  ${cyan('secret-scan')}          Scan for committed secrets (keys, tokens)    ${dim('[--staged --since <ref> --json --root <dir>]')}
   ${cyan('extension validate')}   Check extension registration completeness    ${dim('[<id> --root <dir>]')}
   ${cyan('capability add')}       Scaffold a new capability                    ${dim('<id> [--root <dir>]')}
   ${cyan('help')} | ${cyan('version')}
