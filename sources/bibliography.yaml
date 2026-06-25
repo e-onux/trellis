@@ -21,3 +21,63 @@ sources:
         - "Adoption figures move quickly; revisit at review time."
     last_verified: 2026-06-12
     next_review: 2027-06-12
+  - id: source-0002
+    title: "OWASP Top 10 - the standard awareness document for web application security risks"
+    type: standard
+    url: https://owasp.org/www-project-top-ten/
+    license: CC-BY-SA-4.0
+    local_copy:
+      path: null
+      sha256: null
+    supports:
+      - ADR-0006
+    relevance:
+      claim: >
+        OWASP Top 10 is the widely-adopted reference for the most critical web application security
+        risks (injection, broken access control, security misconfiguration, vulnerable components,
+        cryptographic failures), and frames the core principles of the security manifesto.
+      confidence: high
+      limitations:
+        - "Web-app oriented; complement with the LLM Top 10 for AI features."
+    last_verified: 2026-06-18
+    next_review: 2027-06-18
+  - id: source-0003
+    title: "OWASP Top 10 for LLM Applications"
+    type: standard
+    url: https://genai.owasp.org/llm-top-10/
+    license: CC-BY-SA-4.0
+    local_copy:
+      path: null
+      sha256: null
+    supports:
+      - ADR-0006
+    relevance:
+      claim: >
+        The OWASP Top 10 for LLM Applications catalogues prompt injection (LLM01), sensitive
+        information disclosure (LLM02) and excessive agency (LLM06), which back the llm-app section
+        of the security manifesto.
+      confidence: high
+      limitations:
+        - "A young, fast-moving list; revisit at review time."
+    last_verified: 2026-06-18
+    next_review: 2027-06-18
+  - id: source-0004
+    title: "CISA - Secure by Design"
+    type: official-documentation
+    url: https://www.cisa.gov/securebydesign
+    license: unknown
+    local_copy:
+      path: null
+      sha256: null
+    supports:
+      - ADR-0006
+    relevance:
+      claim: >
+        CISA's Secure by Design principles (take ownership of security outcomes, default-secure
+        configurations, build security in rather than bolt it on) frame the manifesto's posture of
+        fail-closed defaults and security-sensitive human-approval gates.
+      confidence: high
+      limitations:
+        - "Principles, not a checklist; operationalized here as the manifesto + secret-scan gate."
+    last_verified: 2026-06-18
+    next_review: 2027-06-18
