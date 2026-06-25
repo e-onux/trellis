@@ -8,7 +8,7 @@ Two ways to adopt Trellis. Both end with the same governed structure.
    ```bash
    curl -o TRELLIS.md https://raw.githubusercontent.com/e-onux/trellis/main/TRELLIS.md
    ```
-2. Tell your agent (Claude Code, Codex, Copilot, Cursor, Windsurf, Gemini CLI…):
+2. Tell your agent (Claude Code, Codex, Copilot, Cursor, Windsurf, Gemini CLI...):
    > "Read `TRELLIS.md` and bootstrap this repository according to it."
 
 The agent scaffolds governance, extracts decisions into ADRs, discovers capabilities, and generates the

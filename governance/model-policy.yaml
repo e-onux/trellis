@@ -8,16 +8,14 @@ version: "0.1"
 # in this list (and is present) is a violation. Keep this to the capable, intended models;
 # the whole point is to stop a degraded fallback from silently shipping code.
 allowed_models:
-  - claude-opus-4-8
-  - claude-sonnet-4-6
-  - claude-fable-5
-  - gpt-5-codex
-  - gpt-5
+  # Replace with the exact model ids you trust to author code here (e.g. "vendor-model-version").
+  - your-primary-model
+  - your-secondary-model
 
 # Optional explicit block-list (redundant with the allow-list, but documents intent and
 # catches a model that is otherwise on a shared allow-list). Example:
 # disallow:
-#   - claude-haiku-4-5
+#   - a-known-weak-fallback-model
 disallow: []
 
 # Fail-closed: a commit in the enforcement window with no recorded provenance is a violation.

@@ -20,7 +20,7 @@
 ## Scenarios
 - **Normal:** DE / 2 kg / standard → €4.99, 3 days
 - **Normal:** DE / 2 kg / express → €11.99, 1 day
-- **Error:** weight −1 kg → `INVALID_WEIGHT`
+- **Error:** weight -1 kg → `INVALID_WEIGHT`
 
 ## Verification
 Run in the cockpit (enter destination/weight/method, compare expected vs actual) and via the contract test,

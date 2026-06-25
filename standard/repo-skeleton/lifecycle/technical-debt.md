@@ -5,4 +5,4 @@ that should force action (often a budget breach).
 
 | ID | Where | Description | Trigger to address | Severity |
 |---|---|---|---|---|
-| TD-001 | capability-id | … | budget exceeded | low/med/high |
+| TD-001 | capability-id | ... | budget exceeded | low/med/high |

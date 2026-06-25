@@ -31,7 +31,7 @@ New profiles (e.g. `mobile`, `infra`) or budget recalibration. Each default budg
 - Run `npm install` then `npm test`.
 - Run `npm run selfcheck` - it validates the bundled example capability and must stay green.
 
-### 4. Adapters (root `AGENTS.md` / `CLAUDE.md` / `.cursor/` / …)
+### 4. Adapters (root `AGENTS.md` / `CLAUDE.md` / `.cursor/` / ...)
 
 `AGENTS.md` is the **single source of truth**. Per-tool files must remain thin pointers - never duplicate rules into them, or they become a second, drifting source of truth.
 

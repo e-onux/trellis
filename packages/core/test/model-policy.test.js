@@ -58,7 +58,7 @@ test('loadModelPolicy reads this repository own policy', () => {
   const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..', '..');
   const policy = loadModelPolicy(repoRoot);
   assert.ok(policy, 'repo declares governance/model-policy.yaml');
-  assert.ok(policy.allowed.includes('claude-opus-4-8'));
+  assert.ok(policy.allowed.length >= 1, 'declares an allow-list of authoring models');
   assert.equal(policy.requireProvenance, true);
 });
 

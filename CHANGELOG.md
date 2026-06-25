@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Model policy (ADR-0005): declare which models may author code in `governance/model-policy.yaml`;
+  `trellis model-check` is a fail-closed gate (provenance recorded out-of-band in
+  `.trellis/provenance.jsonl`, so commit messages stay clean) and `trellis model-stamp` records it -
+  so a degraded fallback model cannot silently ship code.
+- Security manifesto (ADR-0006): a profile-aware, evidence-backed `governance/security-manifesto.md`
+  of what an agent must watch for, plus one enforced rule - `trellis secret-scan` (fail-closed,
+  high-signal, never prints the secret). Deep SAST stays delegated to external tools (Semgrep, CodeQL).
 - Evidence graph as data (ADR-0004): `@sidrelabs/trellis-core` now exposes the evidence graph via
   `loadEvidenceGraph` / `buildEvidenceGraph` (the build-evidence-graph capability) - reading only the
   governance files, locally, with no network. Rendering and navigation moved to a separate tool,

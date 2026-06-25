@@ -12,7 +12,7 @@ What boundary or budget is being exceeded?
 - direct dependencies: N (budget M)
 - distinct change reasons: N
 - regressions in last 10 changes: N
-- domains touched: …
+- domains touched: ...
 
 ## Proposed split / restructure
 
@@ -21,7 +21,7 @@ What boundary or budget is being exceeded?
 
 ## Risks
 
-- API change, migration need, temporary duplication, …
+- API change, migration need, temporary duplication, ...
 
 ## Test plan
 

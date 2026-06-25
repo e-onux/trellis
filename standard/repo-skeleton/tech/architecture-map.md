@@ -11,7 +11,7 @@ edges. The architecture invariants in `quality/architecture-invariants.md` make 
 
 | Capability | Owns | Talks to |
 |---|---|---|
-| … | … | … |
+| ... | ... | ... |
 
 ## Diagram
 

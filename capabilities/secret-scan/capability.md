@@ -6,7 +6,7 @@ keys and tokens and fails closed on a hit, so CI or a pre-commit hook can block 
 
 - **High-signal rules** - private keys, and provider patterns (AWS, GitHub, Slack, Google, Stripe,
   Anthropic, OpenAI), plus one generic `key = "value"` rule that is **placeholder-guarded** (skips
-  `your-…`, `xxxx`, `${VAR}`, `process.env.…`, etc.).
+  `your-...`, `xxxx`, `${VAR}`, `process.env....`, etc.).
 - **Never leaks** - a finding carries the rule, `file:line` and the secret's length, never the value.
 - **Allowlist** - an inline `trellis-allow-secret` (or `pragma: allowlist secret`, `gitleaks:allow`)
   comment on a line suppresses it, for intentional fixtures and documentation.

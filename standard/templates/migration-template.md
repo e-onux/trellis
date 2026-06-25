@@ -2,7 +2,7 @@
 
 - **status:** draft
 - **related ADR:** ADR-XXXX
-- **affected capabilities:** …
+- **affected capabilities:** ...
 
 ## Why
 
@@ -10,8 +10,8 @@ What decision or refactor forces this migration?
 
 ## Steps
 
-1. …
-2. …
+1. ...
+2. ...
 
 ## Backward compatibility
 

@@ -8,7 +8,7 @@
 
 *From vibe coding to maintainable software.*
 
-A capability-first, evidence-governed standard that keeps AI-generated software understandable, testable and maintainable as it grows — it brings memory, decisions, boundaries and evidence into your repo, so AI-assisted projects can grow without losing control.
+A capability-first, evidence-governed standard that keeps AI-generated software understandable, testable and maintainable as it grows - it brings memory, decisions, boundaries and evidence into your repo, so AI-assisted projects can grow without losing control.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 [![Standard](https://img.shields.io/badge/spec-Trellis%20Standard%20v0.1-2ea44f.svg)](./standard/README.md)
@@ -38,7 +38,7 @@ In 2026, AI writes a large share of production code - but without governance, st
 
 ## What Trellis is
 
-Trellis is **not another coding agent**. It is an **agent-independent repository standard** plus a small toolchain that layers on top of the agent you already use (Claude Code, Codex, GitHub Copilot, Cursor, Windsurf, Gemini CLI…).
+Trellis is **not another coding agent**. It is an **agent-independent repository standard** plus a small toolchain that layers on top of the agent you already use (Claude Code, Codex, GitHub Copilot, Cursor, Windsurf, Gemini CLI...).
 
 It is built from parts that exist separately elsewhere - but combines them into one standard that no single tool offers today:
 
@@ -54,6 +54,8 @@ It is built from parts that exist separately elsewhere - but combines them into 
 | 🛑 **Obligation to *not* write code** | Machine-readable stop conditions; agent proposes split/refactor/ADR instead | `governance/agent-authority.md` |
 | 🚦 **Quality gates** | CI gates: contract, budget, drift, evidence, regression | `.github/workflows/`, `quality/quality-gates.yaml` |
 | ⏳ **Technology lifecycle** | Upgrade & refactor triggers so decisions don't silently rot | `tech/technology-radar.md` |
+| 🤖 **Model policy** | Declare which models may author code; a fail-closed gate blocks a degraded fallback | `governance/model-policy.yaml` + `trellis model-check` |
+| 🔒 **Security manifesto** | Profile-aware security principles + an enforced no-committed-secrets gate | `governance/security-manifesto.md` + `trellis secret-scan` |
 
 ## Multi-platform support
 
@@ -76,13 +78,13 @@ There are three ways to adopt Trellis. All produce the same governed structure.
 
 ### Option A0 - Single prompt (truly zero-touch) ⭐⭐
 
-Paste one prompt into your agent — no files to download, no wizard to visit:
+Paste one prompt into your agent - no files to download, no wizard to visit:
 
 > "Fetch https://raw.githubusercontent.com/e-onux/trellis/main/INSTALL.md and follow its instructions."
 
 The agent fetches [`INSTALL.md`](./INSTALL.md), analyzes your project, downloads and applies
 `TRELLIS.md`, scaffolds governance, and discards the install file when done. Your project ends up
-with only the governed structure — no installation artifacts.
+with only the governed structure - no installation artifacts.
 
 ### Option A - Agent-native (one curl) ⭐
 
@@ -109,6 +111,8 @@ npx @sidrelabs/trellis validate          # contract + budget + drift checks
 npx @sidrelabs/trellis budget-check       # capability size/dependency budgets
 npx @sidrelabs/trellis audit              # whole-repo health report
 npx @sidrelabs/trellis extension validate # extension completeness gate
+npx @sidrelabs/trellis secret-scan        # no committed secrets (security gate)
+npx @sidrelabs/trellis model-check        # commits authored by an allowed model
 ```
 
 ## See the evidence graph
@@ -160,8 +164,7 @@ trellis/
 ├── capabilities/  tech/decisions/  sources/  quality/   ← this repo governed by its own standard
 └── docs/
     ├── comparison.md      ← how Trellis relates to Spec Kit, OpenSpec, BMAD, Kiro, Tessl, AGENTS.md
-    ├── integrations/      ← per-tool guides (Claude Code, Codex, Copilot, Cursor, Windsurf, Gemini)
-    └── founding-design.md ← the original concept this project grew from
+    └── integrations/      ← per-tool guides (Claude Code, Codex, Copilot, Cursor, Windsurf, Gemini)
 ```
 
 The landing page + wizard ([vibecodegovern.com](https://vibecodegovern.com)) is maintained in a separate

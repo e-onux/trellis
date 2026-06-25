@@ -176,7 +176,7 @@ const commands = {
   'model-stamp'(flags) {
     const repoRoot = rootOf(flags);
     const model = typeof flags.model === 'string' ? flags.model : undefined;
-    if (!model) fail('Provide --model <id>  (e.g. trellis model-stamp --commit HEAD --model claude-opus-4-8)');
+    if (!model) fail('Provide --model <id>  (e.g. trellis model-stamp --commit HEAD --model my-frontier-model)');
     const ref = typeof flags.commit === 'string' ? flags.commit : 'HEAD';
     let commit = ref;
     try { commit = execFileSync('git', ['rev-parse', ref], { cwd: repoRoot, encoding: 'utf8' }).trim(); } catch { /* not a git ref; record as given */ }
