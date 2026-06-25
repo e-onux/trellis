@@ -10,6 +10,7 @@ export { loadEvidenceModel, loadEvidenceGraph } from './evidence.js';
 export {
   checkModelProvenance, classifyCommits, loadModelPolicy, readProvenance, stampProvenance, PROVENANCE_FILE
 } from './model-policy.js';
+export { scanSecrets, detectSecrets } from './secret-scan.js';
 export { parseYaml, stringifyYaml, readYaml, extractYamlBlock } from './yaml.js';
 export { findStandardDir } from './util.js';
 

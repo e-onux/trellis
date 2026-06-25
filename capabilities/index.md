@@ -12,6 +12,7 @@ runs against these in CI.
 | compose-artifacts | active | toolchain | [contract.yaml](./compose-artifacts/contract.yaml) |
 | build-evidence-graph | active | toolchain | [contract.yaml](./build-evidence-graph/contract.yaml) |
 | check-model-provenance | active | toolchain | [contract.yaml](./check-model-provenance/contract.yaml) |
+| secret-scan | active | toolchain | [contract.yaml](./secret-scan/contract.yaml) |
 
 Budgets measure the real implementation files under `packages/core/src/` via each contract's
 `implementation:` list, including real import scanning.

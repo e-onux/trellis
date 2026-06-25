@@ -43,6 +43,10 @@ gates:
     description: Every in-window commit was authored by an allow-listed model (run `trellis model-check`).
     enforced: true
     severity: error
+  - id: secret-scan
+    description: No committed secrets - the enforced rule of the security manifesto (run `trellis secret-scan`).
+    enforced: true
+    severity: error
   - id: review-freshness
     description: No ADR/source review is overdue.
     enforced: false

@@ -36,3 +36,8 @@ capabilities:
     owner: toolchain
     path: capabilities/check-model-provenance
     depends_on: []
+  - id: secret-scan
+    status: active
+    owner: toolchain
+    path: capabilities/secret-scan
+    depends_on: []
