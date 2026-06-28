@@ -1,0 +1,92 @@
+id: build-evidence-graph
+title: Build the evidence graph
+owner: toolchain
+version: 0.1.0
+status: active
+
+intent:
+  description: >
+    Normalize a governed repository's sources, decisions (ADRs) and capabilities into one
+    deduplicated node/edge graph - the Source -> Decision -> Capability provenance the audit
+    verifies and the visualization renders. References that resolve become edges; references that
+    point at nothing are reported as dangling, never silently dropped.
+
+responsibility:
+  does:
+    - load sources, decisions and capabilities through the shared evidence loaders
+    - emit typed nodes and deduplicated cites / governed-by edges
+    - report unresolved references as dangling
+  does_not:
+    - render any output format (separate consumers such as the Trelliscope viewer do that)
+    - fail the build on dangling references (that is the audit's evidence gate)
+
+inputs:
+  model:
+    type: object
+    required: true
+    description: A loaded { sources, decisions, capabilities }; loadEvidenceGraph reads it from a repo_root.
+
+outputs:
+  nodes:
+    type: array
+  edges:
+    type: array
+  dangling:
+    type: array
+
+examples:
+  - name: Resolvable references become one deduplicated edge
+    input:
+      model:
+        sources:
+          - { id: source-1 }
+        decisions:
+          - { id: ADR-1, evidence: [source-1] }
+        capabilities: []
+    expected:
+      edges: 1
+      dangling: 0
+  - name: A citation to a missing source is reported, not linked
+    input:
+      model:
+        sources: []
+        decisions:
+          - { id: ADR-1, evidence: [source-x] }
+        capabilities: []
+    expected_error:
+      code: DANGLING_REFERENCE
+
+invariants:
+  - edges are deduplicated by (from, to, kind)
+  - every edge endpoint is a node in the graph
+  - a reference with no matching node appears in dangling, not edges
+
+dependencies:
+  internal: []
+  external: []
+
+implementation:
+  - packages/core/src/graph.js
+  - packages/core/src/evidence.js
+
+budgets:
+  max_files: 2
+  max_lines_of_code: 200
+  max_direct_dependencies: 0
+  max_public_operations: 5
+  max_change_reasons: 1
+
+verification:
+  unit: required
+  contract: required
+  regression: required
+
+review:
+  interval: 6 months
+  triggers:
+    - the evidence model gains a new node or edge type
+    - the source / ADR / contract schema changes shape
+
+evidence: []
+decisions:
+  - ADR-0004

@@ -1,11 +1,13 @@
 #!/usr/bin/env node
-// Trellis CLI. Thin wrapper over @e-onux/trellis-core. ESM, zero non-core dependencies.
+// Trellis CLI. Thin wrapper over @sidrelabs/trellis-core. ESM, zero non-core dependencies.
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import {
   init, audit, validateContract, budgetCheck, validateExtensions,
-  readYaml, findStandardDir, PROFILES, PRESETS
-} from '@e-onux/trellis-core';
+  readYaml, findStandardDir, PROFILES, PRESETS,
+  checkModelProvenance, stampProvenance, PROVENANCE_FILE, scanSecrets
+} from '@sidrelabs/trellis-core';
 
 // ---- tiny ANSI helpers (no dependency) ---------------------------------------------------------
 const useColor = process.stdout.isTTY && !process.env.NO_COLOR;
@@ -140,6 +142,69 @@ const commands = {
     process.exitCode = report.ok ? 0 : 1;
   },
 
+  'model-check'(flags) {
+    const repoRoot = rootOf(flags);
+    const since = typeof flags.since === 'string' ? flags.since : undefined;
+    const r = checkModelProvenance(repoRoot, { since });
+    if (flags.json) {
+      console.log(JSON.stringify(r, null, 2));
+      process.exitCode = !r.ok && r.enforcement === 'block' ? 1 : 0;
+      return;
+    }
+    if (!r.evaluated) { console.log(warn(`model-provenance not evaluated - ${r.reason}`)); return; }
+    const checked = r.results.length;
+    console.log(bold(`\nModel provenance`) + dim(`  enforcement=${r.enforcement}, ${checked} commit(s) in window\n`));
+    for (const v of r.violations) {
+      const why = v.status === 'unverified' ? 'no recorded model' : `model ${v.model}`;
+      console.log('  ' + bad(`${v.commit.slice(0, 9)}  ${v.status}`) + dim(`  ${why}`));
+    }
+    console.log('');
+    if (r.ok) {
+      console.log(green(bold(`PASS - all ${checked} commit(s) authored by an allowed model`)));
+      process.exitCode = 0;
+    } else if (r.enforcement === 'block') {
+      console.log(red(bold(`FAIL - ${r.violations.length} commit(s) violate the model policy`)));
+      console.log(dim(`Stamp a real author with: trellis model-stamp --commit <sha> --model <id>`));
+      process.exitCode = 1;
+    } else {
+      console.log(yellow(bold(`WARN - ${r.violations.length} commit(s) violate the model policy (advisory)`)));
+      process.exitCode = 0;
+    }
+    console.log('');
+  },
+
+  'model-stamp'(flags) {
+    const repoRoot = rootOf(flags);
+    const model = typeof flags.model === 'string' ? flags.model : undefined;
+    if (!model) fail('Provide --model <id>  (e.g. trellis model-stamp --commit HEAD --model my-frontier-model)');
+    const ref = typeof flags.commit === 'string' ? flags.commit : 'HEAD';
+    let commit = ref;
+    try { commit = execFileSync('git', ['rev-parse', ref], { cwd: repoRoot, encoding: 'utf8' }).trim(); } catch { /* not a git ref; record as given */ }
+    const agent = typeof flags.agent === 'string' ? flags.agent : undefined;
+    stampProvenance(repoRoot, { commit, model, agent });
+    console.log(ok(`Stamped ${commit.slice(0, 9)} → ${model}${agent ? ` (${agent})` : ''}`) + dim(`  in ${PROVENANCE_FILE}`));
+  },
+
+  'secret-scan'(flags) {
+    const repoRoot = rootOf(flags);
+    const r = scanSecrets(repoRoot, { since: typeof flags.since === 'string' ? flags.since : undefined, staged: !!flags.staged });
+    if (flags.json) { console.log(JSON.stringify(r, null, 2)); process.exitCode = r.ok ? 0 : 1; return; }
+    console.log(bold(`\nSecret scan`) + dim(`  ${r.scanned} file(s) scanned\n`));
+    for (const f of r.findings) {
+      console.log('  ' + bad(`${f.file}:${f.line}`) + `  ${f.rule}` + dim(`  (${f.length})`));
+    }
+    console.log('');
+    if (r.ok) {
+      console.log(green(bold(`PASS - no committed secrets`)));
+      process.exitCode = 0;
+    } else {
+      console.log(red(bold(`FAIL - ${r.findings.length} potential secret(s) found`)));
+      console.log(dim(`Move it to env/secret store. Intentional fixture? add an inline 'trellis-allow-secret' comment.`));
+      process.exitCode = 1;
+    }
+    console.log('');
+  },
+
   extension(flags, positional) {
     const sub = positional[0];
     if (sub !== 'validate') fail(`Unknown extension subcommand "${sub || ''}". Try: trellis extension validate [id]`);
@@ -227,6 +292,9 @@ ${bold('Commands')}
   ${cyan('validate')}             Validate capability contracts (+ budgets)   ${dim('[--capability --root <dir>]')}
   ${cyan('budget-check')}         Check capability size/dependency budgets     ${dim('[--capability --root <dir>]')}
   ${cyan('audit')}                Whole-repo health report + quality gates     ${dim('[--json --root <dir>]')}
+  ${cyan('model-check')}          Verify commits were authored by an allowed model  ${dim('[--since <ref> --json --root <dir>]')}
+  ${cyan('model-stamp')}          Record which model authored a commit         ${dim('--model <id> [--commit <ref> --agent <id>]')}
+  ${cyan('secret-scan')}          Scan for committed secrets (keys, tokens)    ${dim('[--staged --since <ref> --json --root <dir>]')}
   ${cyan('extension validate')}   Check extension registration completeness    ${dim('[<id> --root <dir>]')}
   ${cyan('capability add')}       Scaffold a new capability                    ${dim('<id> [--root <dir>]')}
   ${cyan('help')} | ${cyan('version')}

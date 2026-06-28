@@ -1,0 +1,91 @@
+id: secret-scan
+title: Detect committed secrets (the enforced rule of the security manifesto)
+owner: toolchain
+version: 0.1.0
+status: active
+
+intent:
+  description: >
+    Scan a repository's tracked files (or a staged/commit-range diff) for committed credentials,
+    keys and tokens. High-signal by design - specific provider patterns plus private keys plus a
+    placeholder-guarded generic rule - so it can be the one fail-closed rule of the security
+    manifesto without false-positive noise. Never emits the secret itself, only rule, location
+    and length. Honors an inline trellis-allow-secret marker for intentional fixtures.
+
+responsibility:
+  does:
+    - select files to scan (all tracked, --staged, or --since <ref>) and read each safely
+    - match high-signal secret patterns and a guarded generic key=value rule
+    - report findings as rule + file:line + length, redacting the secret
+  does_not:
+    - perform deep vulnerability analysis (SAST is delegated to external tools - see ADR-0006)
+    - modify, rewrite or remediate the repository
+    - print or transmit the matched secret value
+
+inputs:
+  repo_root:
+    type: string
+    required: true
+  since:
+    type: string
+    required: false
+  staged:
+    type: boolean
+    required: false
+
+outputs:
+  ok:
+    type: boolean
+  scanned:
+    type: number
+  findings:
+    type: array
+
+examples:
+  - name: A repository with no committed secrets
+    input:
+      repo_root: ./clean-project
+    expected:
+      ok: true
+  - name: A file that hardcodes a credential
+    input:
+      repo_root: ./project-with-leaked-key
+    expected_error:
+      code: SECRET_DETECTED
+
+invariants:
+  - a finding never contains the matched secret value (rule, location and length only)
+  - an inline trellis-allow-secret marker on a line suppresses that line
+  - binary and oversized files are skipped, not read into findings
+
+dependencies:
+  internal: []
+  external: []
+
+implementation:
+  - packages/core/src/secret-scan.js
+
+budgets:
+  max_files: 1
+  max_lines_of_code: 150
+  max_direct_dependencies: 0
+  max_public_operations: 4
+  max_cyclomatic_complexity: 16
+  max_change_reasons: 1
+
+verification:
+  unit: required
+  contract: required
+  regression: required
+
+review:
+  interval: 12 months
+  triggers:
+    - the false-positive rate climbs (tune rules or add an allowlist file)
+    - a SAST adapter lands (reconsider the boundary)
+    - a new high-value secret format must be covered
+
+evidence:
+  - source-0004
+decisions:
+  - ADR-0006

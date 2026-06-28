@@ -1,5 +1,5 @@
 {
-  "name": "@e-onux/trellis",
+  "name": "@sidrelabs/trellis",
   "version": "0.2.0",
   "description": "Trellis CLI - bootstrap and govern AI-built repositories: init, validate, budget-check, audit, extension.",
   "type": "module",
@@ -21,7 +21,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@e-onux/trellis-core": "0.2.0"
+    "@sidrelabs/trellis-core": "0.2.0"
   },
   "engines": {
     "node": ">=18"

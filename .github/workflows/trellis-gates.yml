@@ -47,7 +47,7 @@ jobs:
           (cd packages/core && npm pack --pack-destination /tmp/packtest)
           (cd packages/cli && npm pack --pack-destination /tmp/packtest)
           cd /tmp/packtest && npm init -y
-          npm install ./e-onux-trellis-core-*.tgz
-          npm install ./e-onux-trellis-*.tgz
+          npm install ./sidrelabs-trellis-core-*.tgz
+          npm install ./sidrelabs-trellis-[0-9]*.tgz
           npx trellis init --root /tmp/packtest/demo --profile llm-app --preset strict --agents claude
           npx trellis audit --root /tmp/packtest/demo

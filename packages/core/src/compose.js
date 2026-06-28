@@ -20,7 +20,7 @@ export const MODULES = [
   { key: 'evidence_graph', label: 'Evidence graph', hint: 'Source → Decision → Capability → Test provenance.' },
   { key: 'decision_lifecycle', label: 'Decision lifecycle (ADRs)', hint: 'Conditional decisions with review triggers.' },
   { key: 'extensions', label: 'Extension contracts', hint: 'Required registration points for plugins/providers.' },
-  { key: 'tech_radar', label: 'Technology radar', hint: 'Upgrade/refactor triggers so choices don’t rot.' },
+  { key: 'tech_radar', label: 'Technology radar', hint: 'Upgrade/refactor triggers so choices do not rot.' },
   { key: 'test_cockpit', label: 'User test cockpit', hint: 'Human-verifiable expected-vs-actual surface.' }
 ];
 
@@ -116,7 +116,7 @@ export function trellisConfigToYaml(config) {
 /** The npx command that reproduces a given wizard selection. */
 export function composeNpxCommand({ profile, preset, agents }) {
   const a = (agents && agents.length) ? ` --agents ${agents.join(',')}` : '';
-  return `npx @e-onux/trellis init --profile ${profile} --preset ${preset}${a}`;
+  return `npx @sidrelabs/trellis init --profile ${profile} --preset ${preset}${a}`;
 }
 
 const ENABLED = (m, k) => m && m[k] !== false;

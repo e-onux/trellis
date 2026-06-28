@@ -4,15 +4,19 @@
 
 # Trellis
 
-**A capability-first, evidence-governed standard that keeps AI-generated software understandable, testable and maintainable as it grows.**
+**A repo standard for governable vibe coding.**
 
-*Let AI-built software grow without sprawling.*
+*From vibe coding to maintainable software.*
+
+A capability-first, evidence-governed standard that keeps AI-generated software understandable, testable and maintainable as it grows - it brings memory, decisions, boundaries and evidence into your repo, so AI-assisted projects can grow without losing control.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 [![Standard](https://img.shields.io/badge/spec-Trellis%20Standard%20v0.1-2ea44f.svg)](./standard/README.md)
 [![Agent-independent](https://img.shields.io/badge/agents-Claude%20Code%20·%20Codex%20·%20Copilot%20·%20Cursor%20·%20Windsurf%20·%20Gemini-555.svg)](#multi-platform-support)
 
-### 🌐 [**trellis.sidre.site**](https://trellis.sidre.site) - try the wizard
+### 🌐 [**vibecodegovern.com**](https://vibecodegovern.com) - try the wizard
+
+<sub>An open-source project by **SidreLabs** · part of the **VibeCodeGovern** initiative</sub>
 
 </div>
 
@@ -34,7 +38,7 @@ In 2026, AI writes a large share of production code - but without governance, st
 
 ## What Trellis is
 
-Trellis is **not another coding agent**. It is an **agent-independent repository standard** plus a small toolchain that layers on top of the agent you already use (Claude Code, Codex, GitHub Copilot, Cursor, Windsurf, Gemini CLI…).
+Trellis is **not another coding agent**. It is an **agent-independent repository standard** plus a small toolchain that layers on top of the agent you already use (Claude Code, Codex, GitHub Copilot, Cursor, Windsurf, Gemini CLI...).
 
 It is built from parts that exist separately elsewhere - but combines them into one standard that no single tool offers today:
 
@@ -50,6 +54,8 @@ It is built from parts that exist separately elsewhere - but combines them into 
 | 🛑 **Obligation to *not* write code** | Machine-readable stop conditions; agent proposes split/refactor/ADR instead | `governance/agent-authority.md` |
 | 🚦 **Quality gates** | CI gates: contract, budget, drift, evidence, regression | `.github/workflows/`, `quality/quality-gates.yaml` |
 | ⏳ **Technology lifecycle** | Upgrade & refactor triggers so decisions don't silently rot | `tech/technology-radar.md` |
+| 🤖 **Model policy** | Declare which models may author code; a fail-closed gate blocks a degraded fallback | `governance/model-policy.yaml` + `trellis model-check` |
+| 🔒 **Security manifesto** | Profile-aware security principles + an enforced no-committed-secrets gate | `governance/security-manifesto.md` + `trellis secret-scan` |
 
 ## Multi-platform support
 
@@ -72,13 +78,13 @@ There are three ways to adopt Trellis. All produce the same governed structure.
 
 ### Option A0 - Single prompt (truly zero-touch) ⭐⭐
 
-Paste one prompt into your agent — no files to download, no wizard to visit:
+Paste one prompt into your agent - no files to download, no wizard to visit:
 
 > "Fetch https://raw.githubusercontent.com/e-onux/trellis/main/INSTALL.md and follow its instructions."
 
 The agent fetches [`INSTALL.md`](./INSTALL.md), analyzes your project, downloads and applies
 `TRELLIS.md`, scaffolds governance, and discards the install file when done. Your project ends up
-with only the governed structure — no installation artifacts.
+with only the governed structure - no installation artifacts.
 
 ### Option A - Agent-native (one curl) ⭐
 
@@ -100,11 +106,28 @@ npm install
 node packages/cli/bin/trellis.js --help
 
 # in a target project (once published to npm)
-npx @e-onux/trellis init --profile backend --agents claude,codex,copilot --preset standard
-npx @e-onux/trellis validate          # contract + budget + drift checks
-npx @e-onux/trellis budget-check       # capability size/dependency budgets
-npx @e-onux/trellis audit              # whole-repo health report
-npx @e-onux/trellis extension validate # extension completeness gate
+npx @sidrelabs/trellis init --profile backend --agents claude,codex,copilot --preset standard
+npx @sidrelabs/trellis validate          # contract + budget + drift checks
+npx @sidrelabs/trellis budget-check       # capability size/dependency budgets
+npx @sidrelabs/trellis audit              # whole-repo health report
+npx @sidrelabs/trellis extension validate # extension completeness gate
+npx @sidrelabs/trellis secret-scan        # no committed secrets (security gate)
+npx @sidrelabs/trellis model-check        # commits authored by an allowed model
+```
+
+## See the evidence graph
+
+The evidence graph (`Source → Decision → Capability`) is not just validated in CI - you can look at it.
+Trellis exposes it as **data** (`loadEvidenceGraph` in `@sidrelabs/trellis-core`); rendering lives in a
+separate tool so this repo stays bare (see [ADR-0004](./tech/decisions/ADR-0004-evidence-graph-visualization.md)):
+
+[**🔭 Trelliscope**](https://github.com/e-onux/trelliscope) (`@sidrelabs/trelliscope`) renders that
+graph as a self-contained HTML app or an Obsidian vault - supporting Obsidian without Trellis depending
+on it.
+
+```bash
+npx @sidrelabs/trelliscope                     # -> trelliscope.html (open in any browser)
+npx @sidrelabs/trelliscope --format obsidian   # -> an Obsidian vault you can open as-is
 ```
 
 ## Progressive adoption
@@ -141,11 +164,10 @@ trellis/
 ├── capabilities/  tech/decisions/  sources/  quality/   ← this repo governed by its own standard
 └── docs/
     ├── comparison.md      ← how Trellis relates to Spec Kit, OpenSpec, BMAD, Kiro, Tessl, AGENTS.md
-    ├── integrations/      ← per-tool guides (Claude Code, Codex, Copilot, Cursor, Windsurf, Gemini)
-    └── founding-design.md ← the original concept this project grew from
+    └── integrations/      ← per-tool guides (Claude Code, Codex, Copilot, Cursor, Windsurf, Gemini)
 ```
 
-The landing page + wizard ([trellis.sidre.site](https://trellis.sidre.site)) is maintained in a separate
+The landing page + wizard ([vibecodegovern.com](https://vibecodegovern.com)) is maintained in a separate
 website workspace that builds from a checkout of this repository (see ADR-0003); this repo stays the bare
 standard + toolchain.
 
@@ -162,12 +184,13 @@ and CI runs `trellis audit --root .` on every push. A worked end-to-end example 
 - [Getting started](./docs/getting-started.md)
 - [How Trellis relates to other tools](./docs/comparison.md)
 - [Integration guides](./docs/integrations/claude-code.md): [Claude Code](./docs/integrations/claude-code.md) · [Codex](./docs/integrations/codex.md) · [Copilot](./docs/integrations/copilot.md) · [Cursor](./docs/integrations/cursor.md) · [Windsurf](./docs/integrations/windsurf.md) · [Gemini](./docs/integrations/gemini.md)
+- [Trelliscope - evidence-graph viewer](https://github.com/e-onux/trelliscope) (separate repo)
 - [Roadmap](./ROADMAP.md) · [Changelog](./CHANGELOG.md)
 
 ## Roadmap
 
 - ✅ **Phase 1** - open standard, schemas, templates, profiles, multi-platform adapters, worked example, and a working CLI (`init` / `validate` / `budget-check` / `audit` / `extension`).
-- ✅ **Phase 2 - web wizard & landing site** (live at [trellis.sidre.site](https://trellis.sidre.site), maintained in a separate website workspace): a static browser wizard that, from your choices (platforms, profile, greenfield/brownfield, strictness, modules), produces three outputs from the *same `compose` engine the CLI uses*: **copy the tailored AI spec**, **copy an `npx` command**, or **download a `.zip`** starter.
+- ✅ **Phase 2 - web wizard & landing site** (live at [vibecodegovern.com](https://vibecodegovern.com), maintained in a separate website workspace): a static browser wizard that, from your choices (platforms, profile, greenfield/brownfield, strictness, modules), produces three outputs from the *same `compose` engine the CLI uses*: **copy the tailored AI spec**, **copy an `npx` command**, or **download a `.zip`** starter.
 - ✅ **v0.2** - honest gate reporting (unevaluated gates are visible, never silently green), real import scanning for budgets, evidence-graph reference validation, npm packaging, self-hosted governance.
 - ⏳ **Next** - see [ROADMAP.md](./ROADMAP.md): decision/source scaffolding commands, wired test gate, brownfield discovery, then the test cockpit MVP.
 

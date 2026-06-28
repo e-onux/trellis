@@ -40,7 +40,7 @@ Then tell Cursor's agent:
 **Option B - CLI (deterministic).**
 
 ```bash
-npx @e-onux/trellis init --profile backend --preset standard --agents cursor,claude
+npx @sidrelabs/trellis init --profile backend --preset standard --agents cursor,claude
 # or, inside this monorepo:
 node packages/cli/bin/trellis.js init --profile backend --preset standard --agents cursor
 ```
@@ -66,10 +66,10 @@ rules - it sends the agent to `AGENTS.md`, which carries the nine rules and refe
 ## Verify with the CLI
 
 ```bash
-npx @e-onux/trellis validate            # contract structure + budgets
-npx @e-onux/trellis budget-check        # files / LOC / dependencies vs budgets
-npx @e-onux/trellis extension validate  # required registration points
-npx @e-onux/trellis audit               # whole-repo health, CI-friendly exit code
+npx @sidrelabs/trellis validate            # contract structure + budgets
+npx @sidrelabs/trellis budget-check        # files / LOC / dependencies vs budgets
+npx @sidrelabs/trellis extension validate  # required registration points
+npx @sidrelabs/trellis audit               # whole-repo health, CI-friendly exit code
 ```
 
 See also: [getting started](../getting-started.md) · [Windsurf](./windsurf.md) · [Claude Code](./claude-code.md)

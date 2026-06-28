@@ -1,5 +1,5 @@
 {
-  "name": "@e-onux/trellis-core",
+  "name": "@sidrelabs/trellis-core",
   "version": "0.2.0",
   "description": "Trellis engine: scaffold, capability budgets with real import scanning, contract and extension validation, repo audit with honest quality gates. Pure ESM, runs in Node and the browser.",
   "type": "module",

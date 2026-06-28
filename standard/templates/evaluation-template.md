@@ -16,7 +16,7 @@ Setup, dataset, environment, tools, sample size.
 
 | Option | Metric A | Metric B | Notes |
 |---|---|---|---|
-| … | … | … | … |
+| ... | ... | ... | ... |
 
 ## Limitations
 

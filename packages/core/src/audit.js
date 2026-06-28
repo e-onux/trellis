@@ -4,42 +4,12 @@
 //
 // Gate honesty: a declared gate that has no wired check is reported as `not-evaluated`,
 // never as silently passed. Only a measured, failing, enforced gate fails the build.
-import { fs, path, walkFiles } from './util.js';
-import { readYaml, extractYamlBlock } from './yaml.js';
+import { fs, path } from './util.js';
+import { readYaml } from './yaml.js';
 import { validateContract } from './contract.js';
 import { budgetCheck } from './budgets.js';
 import { validateExtensions } from './extension.js';
-
-function loadConfig(repoRoot) {
-  const p = path.join(repoRoot, '.trellis.yaml');
-  return fs.existsSync(p) ? readYaml(p) : {};
-}
-
-function findCapabilityDirs(repoRoot, capsDir) {
-  const base = path.join(repoRoot, capsDir);
-  if (!fs.existsSync(base)) return [];
-  return fs.readdirSync(base, { withFileTypes: true })
-    .filter((e) => e.isDirectory())
-    .map((e) => path.join(base, e.name))
-    .filter((d) => fs.existsSync(path.join(d, 'contract.yaml')));
-}
-
-function collectAdrs(repoRoot) {
-  const ids = new Set();
-  const adrs = [];
-  const dir = path.join(repoRoot, 'tech', 'decisions');
-  for (const file of walkFiles(dir)) {
-    if (!file.endsWith('.md')) continue;
-    const doc = extractYamlBlock(fs.readFileSync(file, 'utf8'));
-    if (doc?.id) { ids.add(doc.id); adrs.push({ id: doc.id, doc, file }); }
-  }
-  return { ids, adrs };
-}
-
-function loadSources(repoRoot) {
-  const bib = path.join(repoRoot, 'sources', 'bibliography.yaml');
-  return fs.existsSync(bib) ? (readYaml(bib)?.sources || []) : [];
-}
+import { loadConfig, findCapabilityDirs, loadAdrs, loadSources } from './evidence.js';
 
 function checkReviewFreshness(adrs, sources, today) {
   const overdue = [];
@@ -113,7 +83,7 @@ export function audit(repoRoot, { now } = {}) {
     });
   }
 
-  const adrInfo = collectAdrs(repoRoot);
+  const adrInfo = loadAdrs(repoRoot);
   const sources = loadSources(repoRoot);
   const reviews = checkReviewFreshness(adrInfo.adrs, sources, now ? new Date(now) : new Date());
   const references = checkReferences(capabilities, adrInfo, sources);

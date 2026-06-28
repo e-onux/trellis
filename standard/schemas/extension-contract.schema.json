@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/e-onux/trellis/main/standard/schemas/extension-contract.schema.json",
   "title": "Trellis Extension Contract",
-  "description": "Directory-local, machine-readable contract listing the files that MUST be updated to add, change or remove an extension (plugin, module, provider, adapter…). Turns EXTENSIONS.md into a verifiable, living contract.",
+  "description": "Directory-local, machine-readable contract listing the files that MUST be updated to add, change or remove an extension (plugin, module, provider, adapter...). Turns EXTENSIONS.md into a verifiable, living contract.",
   "type": "object",
   "required": [
     "id",

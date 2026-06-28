@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/e-onux/trellis/main/standard/schemas/source.schema.json",
   "title": "Trellis Source Record",
-  "description": "A piece of evidence (paper, benchmark, doc, standard, incident…) linked to the decisions and capabilities it supports. Forms the evidence graph.",
+  "description": "A piece of evidence (paper, benchmark, doc, standard, incident...) linked to the decisions and capabilities it supports. Forms the evidence graph.",
   "type": "object",
   "required": [
     "id",

@@ -5,4 +5,4 @@ timelines. Each constraint that drives a technical choice should be referenced f
 
 | Constraint | Type | Drives |
 |---|---|---|
-| … | regulatory / budget / performance / … | ADR-… |
+| ... | regulatory / budget / performance / ... | ADR-... |

@@ -22,7 +22,7 @@ alternatives:
 
 assumptions:
   - The website keeps consuming compose.js and standard/ read-only; it contributes nothing back.
-  - The production host (trellis.sidre.site) is deployed from the website workspace, not from CI here.
+  - The production host (vibecodegovern.com) is deployed from the website workspace, not from CI here.
 
 consequences:
   positive:
