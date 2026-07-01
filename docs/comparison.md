@@ -113,6 +113,23 @@ Isolated, browsable UI states that designers and PMs can inspect without running
 cockpit applies the same "make it visible to non-engineers" principle to system capabilities rather than UI
 components; the `frontend` profile pairs naturally with Storybook.
 
+## Two axes no spec tool covers: model policy and a security floor
+
+Every tool above governs the *artifact* - the spec, the tasks, the tests. None governs **which model
+authored the code**, and none enforces a **security floor**. Trellis adds both, as governance rather
+than code generation, so they work no matter which spec tool or agent produced the code:
+
+- **Model policy.** Declare the models allowed to author code in
+  [`governance/model-policy.yaml`](../governance/model-policy.yaml); `trellis model-check` is a
+  fail-closed gate that blocks a commit from a disallowed or unverified model - so an agent that
+  silently falls back to a weaker model cannot quietly ship code. Provenance is recorded out-of-band,
+  so commit messages stay clean.
+- **Security floor.** A profile-aware [security manifesto](../governance/security-manifesto.md)
+  (grounded in OWASP Top 10, the OWASP LLM Top 10 and CISA Secure by Design) states what an agent must
+  watch for, and `trellis secret-scan` enforces the one rule that can be enforced cleanly: no committed
+  secrets. Deep vulnerability analysis stays delegated to real tools (Semgrep, CodeQL) - Trellis
+  governs, it does not re-implement a scanner.
+
 ## At a glance
 
 | Tool | What to build | Why it was built | How much it may grow | How it is verified | Who can verify |
