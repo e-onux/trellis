@@ -183,6 +183,7 @@ and CI runs `trellis audit --root .` on every push. A worked end-to-end example 
 ## Docs
 
 - [Getting started](./docs/getting-started.md)
+- [Why AI-generated code needs governance](./docs/why-governance.md)
 - [How Trellis relates to other tools](./docs/comparison.md)
 - [Integration guides](./docs/integrations/claude-code.md): [Claude Code](./docs/integrations/claude-code.md) · [Codex](./docs/integrations/codex.md) · [Copilot](./docs/integrations/copilot.md) · [Cursor](./docs/integrations/cursor.md) · [Windsurf](./docs/integrations/windsurf.md) · [Gemini](./docs/integrations/gemini.md)
 - [Trelliscope - evidence-graph viewer](https://github.com/e-onux/trelliscope) (separate repo)
