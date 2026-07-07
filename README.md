@@ -113,6 +113,7 @@ npx @sidrelabs/trellis audit              # whole-repo health report
 npx @sidrelabs/trellis extension validate # extension completeness gate
 npx @sidrelabs/trellis secret-scan        # no committed secrets (security gate)
 npx @sidrelabs/trellis model-check        # commits authored by an allowed model
+npx @sidrelabs/trellis hook install       # git hooks: stamp author + pre-push model-check
 ```
 
 ## See the evidence graph

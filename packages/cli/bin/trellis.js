@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process';
 import {
   init, audit, validateContract, budgetCheck, validateExtensions,
   readYaml, findStandardDir, PROFILES, PRESETS,
-  checkModelProvenance, stampProvenance, PROVENANCE_FILE, scanSecrets
+  checkModelProvenance, stampProvenance, PROVENANCE_FILE, scanSecrets, installHooks
 } from '@sidrelabs/trellis-core';
 
 // ---- tiny ANSI helpers (no dependency) ---------------------------------------------------------
@@ -205,6 +205,21 @@ const commands = {
     console.log('');
   },
 
+  hook(flags, positional) {
+    const sub = positional[0];
+    if (sub !== 'install') fail(`Unknown hook subcommand "${sub || ''}". Try: trellis hook install [--force] [--only post-commit|pre-push]`);
+    const repoRoot = rootOf(flags);
+    const only = flags.only === 'post-commit' || flags.only === 'pre-push' ? flags.only : undefined;
+    const res = installHooks(repoRoot, { force: !!flags.force, only });
+    console.log(bold(`\nTrellis git hooks`) + dim(`  ${res.dir}\n`));
+    for (const h of res.installed) console.log('  ' + ok(h));
+    for (const s of res.skipped) console.log('  ' + warn(`${s.hook} - ${s.reason}`));
+    console.log('');
+    console.log(dim(`post-commit stamps provenance when TRELLIS_MODEL is set; pre-push runs 'trellis model-check'.`));
+    console.log(dim(`Export TRELLIS_MODEL (and optionally TRELLIS_AGENT) so your commits get stamped.`));
+    console.log('');
+  },
+
   extension(flags, positional) {
     const sub = positional[0];
     if (sub !== 'validate') fail(`Unknown extension subcommand "${sub || ''}". Try: trellis extension validate [id]`);
@@ -295,6 +310,7 @@ ${bold('Commands')}
   ${cyan('model-check')}          Verify commits were authored by an allowed model  ${dim('[--since <ref> --json --root <dir>]')}
   ${cyan('model-stamp')}          Record which model authored a commit         ${dim('--model <id> [--commit <ref> --agent <id>]')}
   ${cyan('secret-scan')}          Scan for committed secrets (keys, tokens)    ${dim('[--staged --since <ref> --json --root <dir>]')}
+  ${cyan('hook install')}         Install git hooks (model-stamp + pre-push check) ${dim('[--force --only <hook> --root <dir>]')}
   ${cyan('extension validate')}   Check extension registration completeness    ${dim('[<id> --root <dir>]')}
   ${cyan('capability add')}       Scaffold a new capability                    ${dim('<id> [--root <dir>]')}
   ${cyan('help')} | ${cyan('version')}
