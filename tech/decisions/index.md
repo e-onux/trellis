@@ -10,3 +10,4 @@ Append-only index of this repository's own ADRs. Supersede, never delete.
 | [ADR-0004](./ADR-0004-evidence-graph-visualization.md) | Expose the evidence graph as data in core; keep the viewer a separate tool | accepted | 2026-06-15 | 2027-06-15 |
 | [ADR-0005](./ADR-0005-model-provenance-gate.md) | Govern which models may author code (model-provenance gate) | accepted | 2026-06-18 | 2027-06-18 |
 | [ADR-0006](./ADR-0006-security-manifesto.md) | Add a security manifesto and an enforceable secret-scan gate | accepted | 2026-06-18 | 2027-06-18 |
+| [ADR-0007](./ADR-0007-model-provenance-hooks.md) | Ship git hooks for model-provenance stamping and pre-push enforcement | accepted | 2026-06-28 | 2027-06-28 |

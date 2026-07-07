@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Model-provenance hooks (ADR-0007): `trellis hook install` writes a post-commit hook that stamps the
+  authoring model (from `TRELLIS_MODEL`, set by the harness) and a pre-push hook that runs
+  `trellis model-check` - so model policy works end to end: declare, auto-stamp, block before push.
 - Model policy (ADR-0005): declare which models may author code in `governance/model-policy.yaml`;
   `trellis model-check` is a fail-closed gate (provenance recorded out-of-band in
   `.trellis/provenance.jsonl`, so commit messages stay clean) and `trellis model-stamp` records it -
