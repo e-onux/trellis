@@ -1,7 +1,7 @@
 # Model policy - which models may author code in this repository. OPTIONAL (opt-in).
 # Validated by the check-model-provenance capability; enforced by `trellis model-check`.
 # Provenance is stored out-of-band in .trellis/provenance.jsonl so commit messages stay clean.
-# See tech/decisions/ADR-0005-model-provenance-gate.md and ADR-0009-model-allow-list-opt-in.md.
+# See the Trellis standard (ADR-0005, ADR-0009: https://github.com/e-onux/trellis/tree/main/tech/decisions).
 #
 # Opt-in: while allowed_models (and disallow) are empty, the check is NOT evaluated - it neither
 # passes nor blocks, and the AGENTS.md "authorized models" rule does not apply. List at least one
@@ -27,8 +27,8 @@ require_provenance: true
 
 # Enforcement window. Commits at or before this point are exempt (you do not retroactively
 # stamp history). Accepts a date (YYYY-MM-DD, matched with `git --since`) or a git ref/range base.
-# Set it to the day you opt in.
-enforce_since: "2026-06-18"
+# Set it to the day you opt in - left unset, every commit in history is checked.
+# enforce_since: "YYYY-MM-DD"
 
 # Once configured - block = a violation fails `trellis model-check` (non-zero exit) so CI/pre-push
 # can block the merge before bad-model code lands. warn = report only, never fail. Reverting code

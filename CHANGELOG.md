@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Model allow-list is optional (ADR-0009, amends ADR-0005/ADR-0007): `governance/model-policy.yaml` ships
+  an empty `allowed_models`; until it names a model (or a `disallow` entry) `trellis model-check` reports
+  **not evaluated** (`ok: null`) - never a silent pass, never a block - and the pre-push hook lets the push
+  through. Old `your-*-model` placeholders no longer count as configuration. AGENTS.md rule 10 (and a new
+  conditional rule in the generated AGENTS.md) applies only when a list is configured; the
+  `model-provenance` gate is declared `enforced: false` and joins the quality-gates schema and skeleton,
+  which also gains an opt-in `governance/model-policy.yaml` template.
 - Model-provenance hooks (ADR-0007): `trellis hook install` writes a post-commit hook that stamps the
   authoring model (from `TRELLIS_MODEL`, set by the harness) and a pre-push hook that runs
   `trellis model-check` - so model policy works end to end: declare, auto-stamp, block before push.

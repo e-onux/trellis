@@ -6,7 +6,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
-  classifyCommits, checkModelProvenance, loadModelPolicy, readProvenance, stampProvenance, PROVENANCE_FILE
+  classifyCommits, checkModelProvenance, loadModelPolicy, readProvenance, stampProvenance, PROVENANCE_FILE,
+  composeAgentsMd
 } from '../src/index.js';
 
 const POLICY = { allowed: ['good-model'], disallow: ['banned-model'], requireProvenance: true };
@@ -54,20 +55,64 @@ test('stampProvenance + readProvenance round-trip; last write wins; bad lines sk
   assert.throws(() => stampProvenance(tmp, { commit: 'x' }));
 });
 
-test('loadModelPolicy reads this repository own policy', () => {
-  const repoRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..', '..');
-  const policy = loadModelPolicy(repoRoot);
+const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..', '..');
+
+function writePolicy(dir, yaml) {
+  fs.mkdirSync(path.join(dir, 'governance'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'governance', 'model-policy.yaml'), yaml);
+}
+
+test('loadModelPolicy: this repository ships an opt-in (unconfigured) policy', () => {
+  const policy = loadModelPolicy(REPO_ROOT);
   assert.ok(policy, 'repo declares governance/model-policy.yaml');
-  assert.ok(policy.allowed.length >= 1, 'declares an allow-list of authoring models');
-  assert.equal(policy.requireProvenance, true);
+  assert.equal(policy.configured, false, 'allow-list is optional; the repo does not restrict its developers');
+  assert.equal(policy.requireProvenance, true, 'fail-closed once an adopter configures a list');
 });
 
-test('checkModelProvenance is not-evaluated (and passing) when no policy is declared', () => {
+test('loadModelPolicy: the skeleton template does not enforce an allow-list', () => {
+  const policy = loadModelPolicy(path.join(REPO_ROOT, 'standard', 'repo-skeleton'));
+  assert.ok(policy, 'skeleton ships governance/model-policy.yaml as an opt-in template');
+  assert.equal(policy.configured, false);
+});
+
+test('loadModelPolicy: template placeholders are not configuration; a real id or a block-list is', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'trellis-policy-'));
+  writePolicy(tmp, 'allowed_models: [your-primary-model, your-secondary-model]\n');
+  assert.equal(loadModelPolicy(tmp).configured, false);
+  writePolicy(tmp, 'allowed_models: [your-primary-model, good-model]\n');
+  assert.deepEqual(loadModelPolicy(tmp).allowed, ['good-model']);
+  assert.equal(loadModelPolicy(tmp).configured, true);
+  writePolicy(tmp, 'allowed_models: []\ndisallow: [banned-model]\n');
+  assert.equal(loadModelPolicy(tmp).configured, true);
+});
+
+test('checkModelProvenance is not-evaluated (neither pass nor fail) when no policy is declared', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'trellis-nopolicy-'));
   const r = checkModelProvenance(tmp);
   assert.equal(r.evaluated, false);
-  assert.equal(r.ok, true);
+  assert.equal(r.ok, null, 'never a silent pass');
+  assert.equal(r.configured, false);
 });
+
+for (const [name, yaml] of [
+  ['absent allow-list', 'version: "0.1"\nrequire_provenance: true\nenforcement: block\n'],
+  ['empty allow-list', 'version: "0.1"\nallowed_models: []\nrequire_provenance: true\nenforcement: block\n'],
+  ['placeholder allow-list', 'version: "0.1"\nallowed_models: [your-primary-model]\nenforcement: block\n']
+]) {
+  test(`checkModelProvenance: ${name} is not evaluated - never a block, never a silent pass`, (t) => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'trellis-optin-'));
+    const git = (...args) => execFileSync('git', ['-c', 'user.email=t@t', '-c', 'user.name=t', ...args], { cwd: tmp, stdio: ['ignore', 'pipe', 'ignore'] });
+    try { git('init', '-q'); } catch { return t.skip('git not available'); }
+    writePolicy(tmp, yaml);
+    fs.writeFileSync(path.join(tmp, 'a.txt'), '1');
+    git('add', '-A'); git('commit', '-qm', 'unstamped');
+    const r = checkModelProvenance(tmp);
+    assert.equal(r.evaluated, false, 'unstamped history must not be judged without a configured list');
+    assert.equal(r.ok, null);
+    assert.equal(r.configured, false);
+    assert.match(r.reason, /not configured/);
+  });
+}
 
 test('checkModelProvenance over a real git repo: fail-closed, then passes once stamped', (t) => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'trellis-git-'));
@@ -85,6 +130,7 @@ test('checkModelProvenance over a real git repo: fail-closed, then passes once s
   // No provenance yet -> fail-closed.
   let r = checkModelProvenance(tmp);
   assert.equal(r.evaluated, true);
+  assert.equal(r.configured, true);
   assert.equal(r.ok, false, 'unstamped commit must fail');
 
   // Stamp with an allowed model -> passes.
@@ -100,4 +146,10 @@ test('checkModelProvenance over a real git repo: fail-closed, then passes once s
   r = checkModelProvenance(tmp);
   assert.equal(r.ok, false);
   assert.ok(r.violations.some((v) => v.status === 'disallowed'));
+});
+
+test('generated AGENTS.md states the model rule as conditional on a configured list', () => {
+  const md = composeAgentsMd('backend');
+  assert.match(md, /Authorized models only - when configured/);
+  assert.match(md, /No list configured → no model restriction/);
 });

@@ -71,3 +71,7 @@ This resolves the ADR-0005 review trigger "the stamping hook lands". The honest 
 an advisory prompt asks a cooperative agent to use an allowed model, `trellis hook install` records the
 real model the harness ran (post-commit) and blocks a disallowed or unverified author before the push
 (pre-push), and none of it claims cryptographic proof.
+
+**Amended by [ADR-0009](./ADR-0009-model-allow-list-opt-in.md):** the allow-list is optional. With no model
+listed in `governance/model-policy.yaml` the check is not evaluated (neither pass nor block), the AGENTS.md
+rule does not apply, and the gate is not declared enforced.

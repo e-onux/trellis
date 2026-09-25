@@ -4,6 +4,7 @@
 //                   which is more trustworthy than asking the model to self-report.
 //   - pre-push    : runs `trellis model-check` (fail-closed, respecting the policy's enforcement
 //                   mode) so a disallowed/unverified commit is blocked before it leaves the machine.
+//                   Passes through when no allow-list is configured (opt-in, ADR-0009).
 // Reads/writes only the git hooks directory; no network. See ADR-0007.
 import { fs, path } from './util.js';
 

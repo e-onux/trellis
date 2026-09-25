@@ -119,8 +119,8 @@ Every tool above governs the *artifact* - the spec, the tasks, the tests. None g
 authored the code**, and none enforces a **security floor**. Trellis adds both, as governance rather
 than code generation, so they work no matter which spec tool or agent produced the code:
 
-- **Model policy.** Declare the models allowed to author code in
-  [`governance/model-policy.yaml`](../governance/model-policy.yaml); `trellis model-check` is a
+- **Model policy (optional).** Opt in by declaring the models allowed to author code in
+  [`governance/model-policy.yaml`](../governance/model-policy.yaml); `trellis model-check` is then a
   fail-closed gate that blocks a commit from a disallowed or unverified model - so an agent that
   silently falls back to a weaker model cannot quietly ship code. Provenance is recorded out-of-band,
   so commit messages stay clean.

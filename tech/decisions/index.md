@@ -11,3 +11,4 @@ Append-only index of this repository's own ADRs. Supersede, never delete.
 | [ADR-0005](./ADR-0005-model-provenance-gate.md) | Govern which models may author code (model-provenance gate) | accepted | 2026-06-18 | 2027-06-18 |
 | [ADR-0006](./ADR-0006-security-manifesto.md) | Add a security manifesto and an enforceable secret-scan gate | accepted | 2026-06-18 | 2027-06-18 |
 | [ADR-0007](./ADR-0007-model-provenance-hooks.md) | Ship git hooks for model-provenance stamping and pre-push enforcement | accepted | 2026-06-28 | 2027-06-28 |
+| [ADR-0009](./ADR-0009-model-allow-list-opt-in.md) | Make the model allow-list optional (opt-in model-provenance gate) | accepted | 2026-09-25 | 2027-09-25 |

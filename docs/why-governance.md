@@ -39,7 +39,7 @@ well. They largely do not answer:
 | Decisions lost in chat | ADRs with assumptions + review triggers, linked to an evidence graph |
 | Silent sprawl | Capability budgets (files, LOC, deps, responsibilities), enforced in CI |
 | "Tests pass" is opaque | A user-facing test cockpit: expected vs actual, per capability |
-| Unknown authorship | Model policy: `trellis model-check` blocks a disallowed or unverified model |
+| Unknown authorship | Optional model policy: once configured, `trellis model-check` blocks a disallowed or unverified model |
 | No security floor | Security manifesto + `trellis secret-scan` (no committed secrets), OWASP/CISA-grounded |
 
 Governance is the layer that turns "the AI wrote it" into "the repository can prove it stays

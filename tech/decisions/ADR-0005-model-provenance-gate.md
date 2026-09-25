@@ -83,3 +83,7 @@ blocks anything unverified or disallowed from merging. None of this claims to *p
 it raises the bar to the same level as `Signed-off-by`/DCO and makes the one bypass (deliberate
 forgery) auditable. Reverting already-landed code is intentionally **not** automatic; the gate
 prevents the merge instead.
+
+**Amended by [ADR-0009](./ADR-0009-model-allow-list-opt-in.md):** the allow-list is optional. With no model
+listed in `governance/model-policy.yaml` the check is not evaluated (neither pass nor block), the AGENTS.md
+rule does not apply, and the gate is not declared enforced.

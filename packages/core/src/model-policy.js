@@ -1,6 +1,10 @@
 // Model-provenance policy: which models may author commits, and a fail-closed check that an
 // allow-listed model is recorded for every commit in the enforcement window.
 //
+// Opt-in (ADR-0009): the check is evaluated only when the policy names at least one model
+// (allowed_models or disallow). An absent/empty list - or one still holding the template
+// placeholders - is reported as not evaluated: never a silent pass, never a block.
+//
 // Provenance is stored out-of-band in .trellis/provenance.jsonl (one JSON record per line:
 // { "commit": "<sha>", "model": "<id>", "agent": "<id>", "at": "<iso>" }) so commit messages
 // stay clean. Reads only local files + `git log`; no network. See ADR-0005.
@@ -10,16 +14,25 @@ import { execFileSync } from 'node:child_process';
 
 export const PROVENANCE_FILE = '.trellis/provenance.jsonl';
 const POLICY_FILE = 'governance/model-policy.yaml';
+// Ids shipped by earlier templates ("your-primary-model"); never a real model, so never configuration.
+const PLACEHOLDER = /^your-[a-z0-9-]*model$/i;
 
-/** Load governance/model-policy.yaml, or null when the repo declares no policy. */
+/**
+ * Load governance/model-policy.yaml, or null when the repo declares no policy.
+ * `configured` is false until the policy names a real model; the check is then not evaluated.
+ */
 export function loadModelPolicy(repoRoot) {
   const file = path.join(repoRoot, POLICY_FILE);
   if (!fs.existsSync(file)) return null;
   const raw = readYaml(file) || {};
+  const list = (v) => (Array.isArray(v) ? v : []).map(String).filter((m) => m.trim() && !PLACEHOLDER.test(m));
+  const allowed = list(raw.allowed_models);
+  const disallow = list(raw.disallow);
   return {
-    allowed: (raw.allowed_models || []).map(String),
-    disallow: (raw.disallow || []).map(String),
-    requireProvenance: raw.require_provenance !== false, // default fail-closed
+    configured: allowed.length > 0 || disallow.length > 0,
+    allowed,
+    disallow,
+    requireProvenance: raw.require_provenance !== false, // default fail-closed (once configured)
     enforceSince: raw.enforce_since ? String(raw.enforce_since) : null,
     enforcement: raw.enforcement === 'warn' ? 'warn' : 'block'
   };
@@ -95,22 +108,26 @@ function listCommits(repoRoot, since) {
   return out.split('\n').map((s) => s.trim()).filter(Boolean);
 }
 
+const notEvaluated = (reason, configured = false) => ({ evaluated: false, ok: null, configured, reason });
+
 /**
  * Fail-closed model-provenance check over the commits in the enforcement window.
- * Not evaluated (and therefore passing) when the repo declares no policy or is not a git repo.
- * @returns {{ evaluated:boolean, ok:boolean, enforcement?:string, results?, violations?, reason? }}
+ * Not evaluated (ok: null - neither pass nor fail) when the repo declares no policy, the policy
+ * names no model (opt-in, ADR-0009), or the repo is not a git repository.
+ * @returns {{ evaluated:boolean, ok:boolean|null, configured:boolean, enforcement?:string, results?, violations?, reason? }}
  */
 export function checkModelProvenance(repoRoot, { since } = {}) {
   repoRoot = path.resolve(repoRoot || process.cwd());
   const policy = loadModelPolicy(repoRoot);
-  if (!policy) return { evaluated: false, ok: true, reason: 'no governance/model-policy.yaml' };
-  if (!isGitRepo(repoRoot)) return { evaluated: false, ok: true, reason: 'not a git repository' };
+  if (!policy) return notEvaluated('no governance/model-policy.yaml');
+  if (!policy.configured) return notEvaluated('model allow-list not configured (allowed_models is empty or holds only template placeholders)');
+  if (!isGitRepo(repoRoot)) return notEvaluated('not a git repository', true);
   let commits;
   try {
     commits = listCommits(repoRoot, since || policy.enforceSince);
   } catch (e) {
-    return { evaluated: false, ok: true, reason: `git rev-list failed: ${e.message}` };
+    return notEvaluated(`git rev-list failed: ${e.message}`, true);
   }
   const { results, violations, ok } = classifyCommits(commits, readProvenance(repoRoot), policy);
-  return { evaluated: true, ok, enforcement: policy.enforcement, policy, results, violations };
+  return { evaluated: true, ok, configured: true, enforcement: policy.enforcement, policy, results, violations };
 }

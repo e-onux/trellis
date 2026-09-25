@@ -1,26 +1,30 @@
 id: check-model-provenance
 title: Check that commits were authored by an allow-listed model
 owner: toolchain
-version: 0.1.0
+version: 0.2.0
 status: active
 
 intent:
   description: >
     Govern which models may author code. Join the commits in the enforcement window with the
     provenance recorded out-of-band in .trellis/provenance.jsonl, then classify each commit
-    against governance/model-policy.yaml. Fail-closed: a disallowed model - or, when provenance
-    is required, a commit with no recorded model - is a violation. The point is to stop a degraded
-    fallback model from silently shipping code.
+    against governance/model-policy.yaml. Opt-in: the check is evaluated only when the policy names
+    at least one model (allowed_models or disallow); otherwise it reports not-evaluated. Once
+    configured it is fail-closed: a disallowed model - or, when provenance is required, a commit
+    with no recorded model - is a violation. The point is to stop a degraded fallback model from
+    silently shipping code.
 
 responsibility:
   does:
     - load the model policy (allow-list, block-list, enforcement window) and the provenance log
+    - report not-evaluated when no model list is configured (absent, empty or template placeholders)
     - classify each in-window commit as allowed, disallowed, unverified or exempt
     - report violations so `trellis model-check` can block a merge before bad-model code lands
   does_not:
     - revert or modify any commit (blocking before merge is preferred to after-the-fact revert)
     - prove authorship cryptographically (provenance is an attestation, like Signed-off-by)
     - reach the network (reads only local files and `git log`)
+    - require adopters to restrict models (the allow-list is optional; ADR-0009)
 
 inputs:
   repo_root:
@@ -33,8 +37,11 @@ inputs:
 outputs:
   evaluated:
     type: boolean
+  configured:
+    type: boolean
   ok:
     type: boolean
+    description: null when not evaluated (neither pass nor fail)
   violations:
     type: array
 
@@ -44,6 +51,12 @@ examples:
       repo_root: ./governed-project
     expected:
       ok: true
+  - name: Policy with an empty allow-list is not evaluated (neither pass nor block)
+    input:
+      repo_root: ./project-without-allow-list
+    expected:
+      evaluated: false
+      ok: null
   - name: A commit authored by a disallowed (or unverified) model
     input:
       repo_root: ./project-with-fallback-commit
@@ -51,8 +64,8 @@ examples:
       code: MODEL_POLICY_VIOLATION
 
 invariants:
-  - a commit with no recorded model fails when require_provenance is true (fail-closed)
-  - no policy file or not a git repository -> not evaluated, never a silent pass
+  - once configured, a commit with no recorded model fails when require_provenance is true (fail-closed)
+  - no policy file, no configured model list, or not a git repository -> not evaluated (ok is null), never a silent pass and never a block
   - the check never writes to or rewrites the repository
 
 dependencies:
@@ -85,3 +98,4 @@ review:
 evidence: []
 decisions:
   - ADR-0005
+  - ADR-0009

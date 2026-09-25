@@ -39,6 +39,10 @@ gates:
     description: Previously-working capabilities still pass.
     enforced: true
     severity: error
+  - id: model-provenance
+    description: Opt-in - when governance/model-policy.yaml lists allowed_models, every in-window commit was authored by an allow-listed model (run `trellis model-check`). Not enforced while no allow-list is configured (ADR-0009); set enforced true once you configure one.
+    enforced: false
+    severity: warning
   - id: review-freshness
     description: No ADR/source review is overdue.
     enforced: false

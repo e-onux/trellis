@@ -148,10 +148,15 @@ const commands = {
     const r = checkModelProvenance(repoRoot, { since });
     if (flags.json) {
       console.log(JSON.stringify(r, null, 2));
-      process.exitCode = !r.ok && r.enforcement === 'block' ? 1 : 0;
+      process.exitCode = r.evaluated && !r.ok && r.enforcement === 'block' ? 1 : 0;
       return;
     }
-    if (!r.evaluated) { console.log(warn(`model-provenance not evaluated - ${r.reason}`)); return; }
+    if (!r.evaluated) {
+      // Opt-in (ADR-0009): no configured allow-list is neither a pass nor a block.
+      console.log(warn(`model-provenance not evaluated - ${r.reason}`));
+      if (!r.configured) console.log(dim(`Opt in by listing allowed_models in governance/model-policy.yaml.`));
+      return;
+    }
     const checked = r.results.length;
     console.log(bold(`\nModel provenance`) + dim(`  enforcement=${r.enforcement}, ${checked} commit(s) in window\n`));
     for (const v of r.violations) {
@@ -307,7 +312,7 @@ ${bold('Commands')}
   ${cyan('validate')}             Validate capability contracts (+ budgets)   ${dim('[--capability --root <dir>]')}
   ${cyan('budget-check')}         Check capability size/dependency budgets     ${dim('[--capability --root <dir>]')}
   ${cyan('audit')}                Whole-repo health report + quality gates     ${dim('[--json --root <dir>]')}
-  ${cyan('model-check')}          Verify commits were authored by an allowed model  ${dim('[--since <ref> --json --root <dir>]')}
+  ${cyan('model-check')}          Verify commits were authored by an allowed model (opt-in)  ${dim('[--since <ref> --json --root <dir>]')}
   ${cyan('model-stamp')}          Record which model authored a commit         ${dim('--model <id> [--commit <ref> --agent <id>]')}
   ${cyan('secret-scan')}          Scan for committed secrets (keys, tokens)    ${dim('[--staged --since <ref> --json --root <dir>]')}
   ${cyan('hook install')}         Install git hooks (model-stamp + pre-push check) ${dim('[--force --only <hook> --root <dir>]')}

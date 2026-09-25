@@ -54,7 +54,7 @@ It is built from parts that exist separately elsewhere - but combines them into 
 | 🛑 **Obligation to *not* write code** | Machine-readable stop conditions; agent proposes split/refactor/ADR instead | `governance/agent-authority.md` |
 | 🚦 **Quality gates** | CI gates: contract, budget, drift, evidence, regression | `.github/workflows/`, `quality/quality-gates.yaml` |
 | ⏳ **Technology lifecycle** | Upgrade & refactor triggers so decisions don't silently rot | `tech/technology-radar.md` |
-| 🤖 **Model policy** | Declare which models may author code; a fail-closed gate blocks a degraded fallback | `governance/model-policy.yaml` + `trellis model-check` |
+| 🤖 **Model policy** (optional) | Opt in by listing which models may author code; a fail-closed gate then blocks a degraded fallback | `governance/model-policy.yaml` + `trellis model-check` |
 | 🔒 **Security manifesto** | Profile-aware security principles + an enforced no-committed-secrets gate | `governance/security-manifesto.md` + `trellis secret-scan` |
 
 ## Multi-platform support
@@ -112,7 +112,7 @@ npx @sidrelabs/trellis budget-check       # capability size/dependency budgets
 npx @sidrelabs/trellis audit              # whole-repo health report
 npx @sidrelabs/trellis extension validate # extension completeness gate
 npx @sidrelabs/trellis secret-scan        # no committed secrets (security gate)
-npx @sidrelabs/trellis model-check        # commits authored by an allowed model
+npx @sidrelabs/trellis model-check        # commits authored by an allowed model (opt-in)
 npx @sidrelabs/trellis hook install       # git hooks: stamp author + pre-push model-check
 ```
 

@@ -33,7 +33,9 @@ export const RULES = [
   'Evidence over confidence - back claims with a source or a test.',
   'Registration over convention - update every required extension registration point.',
   'Single source of truth - never duplicate rules across adapter files.',
-  'The repository is the memory - persist decisions/sources/contracts in the repo, not in chat.'
+  'The repository is the memory - persist decisions/sources/contracts in the repo, not in chat.',
+  // Opt-in (ADR-0009): inert until the adopter lists models in governance/model-policy.yaml.
+  'Authorized models only - when configured: only if `governance/model-policy.yaml` lists `allowed_models` (or `disallow`) and you are not allowed, STOP and ask the user to switch models. No list configured → no model restriction.'
 ];
 
 const REPO_URL = 'https://github.com/e-onux/trellis';

@@ -4,6 +4,11 @@ Governs **which models may author code**. It joins the commits in the enforcemen
 provenance recorded out-of-band in `.trellis/provenance.jsonl` and classifies each one against
 [`governance/model-policy.yaml`](../../governance/model-policy.yaml).
 
+**Optional (opt-in, [ADR-0009](../../tech/decisions/ADR-0009-model-allow-list-opt-in.md)).** The check is
+evaluated only when the policy names at least one model (`allowed_models` or `disallow`). An absent
+policy, an empty list, or a list still holding the template placeholders is reported as **not
+evaluated** (`ok: null`) - never a silent pass, never a block. Once configured:
+
 - **allowed** - the recorded model is on the allow-list.
 - **disallowed** - the recorded model is block-listed, or not on the allow-list.
 - **unverified** - no provenance recorded and `require_provenance: true` (fail-closed → violation).

@@ -37,7 +37,8 @@
               "regression",
               "extension-completeness",
               "maintenance",
-              "review-freshness"
+              "review-freshness",
+              "model-provenance"
             ]
           },
           "description": {
