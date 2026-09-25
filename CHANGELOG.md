@@ -9,6 +9,15 @@
   conditional rule in the generated AGENTS.md) applies only when a list is configured; the
   `model-provenance` gate is declared `enforced: false` and joins the quality-gates schema and skeleton,
   which also gains an opt-in `governance/model-policy.yaml` template.
+- Reuse inventory (ADR-0008): a new `reuse_inventory` module (on by default; `false` in `.trellis.yaml`
+  turns it off) keeps a short index of costly, verified solutions so agents search before re-writing a
+  hard algorithm. `trellis inventory find` returns at most a few short candidates with match reasons and
+  code/test paths; `add`/`update`/`remove`/`validate` keep it honest. It starts as
+  `tech/reuse-index.jsonl` and, at 400 records or 128 KiB (measured - see the ADR), migrates once into
+  the Git-tracked `tech/reuse-index.sqlite` after a verified copy, announced to the user once beforehand.
+  `inventory diff`/`merge` give record-level review and merging of the binary file. The generated
+  `AGENTS.md` gains a "Reuse inventory" section; the advisory `reuse-inventory` gate joins `trellis audit`.
+  Adds `node-sqlite3-wasm` (WASM, Node 18+, no native build) to core, loaded only after migration.
 - Model-provenance hooks (ADR-0007): `trellis hook install` writes a post-commit hook that stamps the
   authoring model (from `TRELLIS_MODEL`, set by the harness) and a pre-push hook that runs
   `trellis model-check` - so model policy works end to end: declare, auto-stamp, block before push.

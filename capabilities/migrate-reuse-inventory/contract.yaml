@@ -1,0 +1,88 @@
+id: migrate-reuse-inventory
+title: Move the reuse inventory from JSONL to a verified SQLite file (one-way format migration)
+owner: toolchain
+version: 0.1.0
+status: active
+
+intent:
+  description: >
+    When the JSONL inventory crosses the measured threshold, migrate it once into a Git-tracked
+    SQLite file that becomes the single source of truth. Build a temporary database, verify it
+    (schema version, count, ids, content, references, integrity_check), atomically move it into
+    place and only then delete the JSONL. Refuse to start until the agent has given the user the
+    one-time notice, and never resolve a half-finished migration silently.
+
+responsibility:
+  does:
+    - refuse to migrate until the caller confirms the user was notified (--notified)
+    - build and verify a temporary SQLite copy, then rename it into place and remove the JSONL
+    - leave the JSONL untouched on any failure before the commit point
+    - resolve a JSONL+SQLite conflict only when both hold identical records, or when the user picks a side
+  does_not:
+    - keep the JSONL as a backup or a second persistent copy
+    - migrate back from SQLite to JSONL
+    - choose a side of a diverged conflict on its own
+
+inputs:
+  repo_root:
+    type: string
+    required: true
+  notified:
+    type: boolean
+    required: true
+
+outputs:
+  migrated:
+    type: boolean
+  checks:
+    type: array
+
+examples:
+  - name: A notified migration of a valid JSONL inventory
+    input:
+      repo_root: ./project-over-threshold
+      notified: true
+    expected:
+      migrated: true
+  - name: A migration attempted before the user was notified
+    input:
+      repo_root: ./project-over-threshold
+      notified: false
+    expected_error:
+      code: NOTICE_REQUIRED
+
+invariants:
+  - on any failure before the rename the JSONL is byte-identical and no SQLite file exists
+  - after success exactly one store exists (SQLite) and every read and write uses it
+  - re-running after success is a no-op; re-running after a failure starts from a clean temp file
+
+dependencies:
+  internal: [reuse-inventory]
+  external: []
+
+implementation:
+  - packages/core/src/inventory-migrate.js
+
+budgets:
+  max_files: 1
+  max_lines_of_code: 130
+  max_direct_dependencies: 0
+  max_public_operations: 3
+  max_cyclomatic_complexity: 16
+  max_change_reasons: 1
+
+verification:
+  unit: required
+  contract: required
+  regression: required
+
+review:
+  interval: 12 months
+  triggers:
+    - the SQLite schema version changes (add an in-place schema upgrade path)
+    - a reported data loss or a conflict that recover could not explain
+
+evidence:
+  - source-0005
+decisions:
+  - ADR-0008

@@ -26,6 +26,7 @@
     "access": "public"
   },
   "dependencies": {
+    "node-sqlite3-wasm": "^0.8.60",
     "yaml": "^2.5.0"
   },
   "engines": {

@@ -1,0 +1,1 @@
+{"id":"text.fuzzy-match","purpose":"Rank candidate strings by edit distance with a Unicode-aware tokenizer.","terms":["levenshtein","edit distance","fuzzy search"],"entry":"src/text/fuzzy.js#fuzzyMatch","tests":["test/text/fuzzy.test.js"],"status":"active","capability":"search-products","adr":"ADR-0004"}

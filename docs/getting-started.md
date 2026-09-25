@@ -33,6 +33,7 @@ trellis validate         # contract structure + budgets
 trellis budget-check     # files / LOC / declared dependencies vs budgets
 trellis extension validate
 trellis audit            # whole-repo health + quality gates (CI-friendly exit code)
+trellis inventory find "<need>"   # reuse inventory: look for an existing solution before building one
 ```
 
 ## Choosing a profile

@@ -56,6 +56,7 @@ It is built from parts that exist separately elsewhere - but combines them into 
 | ⏳ **Technology lifecycle** | Upgrade & refactor triggers so decisions don't silently rot | `tech/technology-radar.md` |
 | 🤖 **Model policy** (optional) | Opt in by listing which models may author code; a fail-closed gate then blocks a degraded fallback | `governance/model-policy.yaml` + `trellis model-check` |
 | 🔒 **Security manifesto** | Profile-aware security principles + an enforced no-committed-secrets gate | `governance/security-manifesto.md` + `trellis secret-scan` |
+| ♻️ **Reuse inventory** | Agents search a short index of costly, verified solutions before re-writing a hard algorithm (bounded answers; JSONL → Git-tracked SQLite as it grows) | `tech/reuse-index.*` + `trellis inventory find` |
 
 ## Multi-platform support
 
@@ -114,6 +115,7 @@ npx @sidrelabs/trellis extension validate # extension completeness gate
 npx @sidrelabs/trellis secret-scan        # no committed secrets (security gate)
 npx @sidrelabs/trellis model-check        # commits authored by an allowed model (opt-in)
 npx @sidrelabs/trellis hook install       # git hooks: stamp author + pre-push model-check
+npx @sidrelabs/trellis inventory find "fuzzy match"   # reuse inventory: find an existing solution first
 ```
 
 ## See the evidence graph
@@ -153,7 +155,7 @@ trellis/
 ├── CLAUDE.md  GEMINI.md  .cursor/  .windsurf/  .github/   ← per-tool adapters
 ├── standard/             ← the open standard
 │   ├── README.md         ← spec overview + adoption levels
-│   ├── schemas/          ← JSON Schemas (contract, ADR, source, gates, radar, extension)
+│   ├── schemas/          ← JSON Schemas (contract, ADR, source, gates, radar, extension, reuse-inventory record)
 │   ├── templates/        ← ADR, capability, source, refactor/split/extension templates
 │   ├── profiles/         ← backend / frontend / data-pipeline / llm-app defaults
 │   └── repo-skeleton/    ← the governed directory tree scaffolded into your repo

@@ -35,6 +35,9 @@ jobs:
       - name: Self-audit (this repo is governed by its own standard)
         run: node packages/cli/bin/trellis.js audit --root .
 
+      - name: Reuse inventory is valid (records resolve to real code, tests, capabilities and ADRs)
+        run: node packages/cli/bin/trellis.js inventory validate --root .
+
       - name: Audit demo project (scaffold + example, enforced gates must pass)
         run: |
           node packages/cli/bin/trellis.js init --root /tmp/demo --profile backend --preset standard --agents claude,codex

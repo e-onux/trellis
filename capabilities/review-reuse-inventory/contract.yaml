@@ -1,0 +1,89 @@
+id: review-reuse-inventory
+title: Review and merge the binary reuse inventory at record level
+owner: toolchain
+version: 0.1.0
+status: active
+
+intent:
+  description: >
+    The SQLite inventory is a binary file, so Git cannot show or merge it. Provide a readable,
+    record-level diff between any two points (including across the JSONL → SQLite migration) and a
+    record-level three-way merge for parallel branches - without keeping a second, persistent text copy.
+
+responsibility:
+  does:
+    - read the inventory at any Git ref in either format
+    - print added, removed and changed records (field by field) between two refs or a ref and the working tree
+    - merge another branch's records three-way, applying one-sided changes and reporting same-id conflicts
+  does_not:
+    - write a text export of the inventory into the repository
+    - resolve a same-id conflict without an explicit --prefer choice
+
+inputs:
+  repo_root:
+    type: string
+    required: true
+  ref:
+    type: string
+    required: false
+
+outputs:
+  added:
+    type: array
+  removed:
+    type: array
+  changed:
+    type: array
+  conflicts:
+    type: array
+
+examples:
+  - name: Diff after adding one record to the SQLite inventory
+    input:
+      repo_root: ./project-on-sqlite
+      ref: HEAD
+    expected:
+      added:
+        - id: cache.lru
+  - name: Diff against a ref that does not exist
+    input:
+      repo_root: ./project-on-sqlite
+      ref: no-such-branch
+    expected_error:
+      code: UNKNOWN_REF
+
+invariants:
+  - a diff across the JSONL → SQLite migration of unchanged records is empty
+  - merge writes nothing while an unresolved same-id conflict remains (reported, exit code 2)
+  - an unknown ref is an error, never read as an empty inventory
+  - only temporary files outside the repository are created to read a ref
+
+dependencies:
+  internal: [reuse-inventory]
+  external: []
+
+implementation:
+  - packages/core/src/inventory-git.js
+
+budgets:
+  max_files: 1
+  max_lines_of_code: 90
+  max_direct_dependencies: 0
+  max_public_operations: 3
+  max_cyclomatic_complexity: 12
+  max_change_reasons: 1
+
+verification:
+  unit: required
+  contract: required
+  regression: required
+
+review:
+  interval: 12 months
+  triggers:
+    - Git gains a practical, versioned merge driver story that removes the manual merge step
+    - teams hit frequent same-id conflicts (consider finer-grained, field-level merge)
+
+evidence: []
+decisions:
+  - ADR-0008

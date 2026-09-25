@@ -15,9 +15,22 @@ export { installHooks, HOOKS } from './hooks.js';
 export { parseYaml, stringifyYaml, readYaml, extractYamlBlock } from './yaml.js';
 export { findStandardDir } from './util.js';
 
+// Reuse inventory (ADR-0008): pure ranking/validation is browser-safe; storage and migration are Node-only.
+export {
+  INVENTORY_SCHEMA_VERSION, INVENTORY_THRESHOLDS, INVENTORY_STATUSES, INVENTORY_LIMITS, FIND_DEFAULT_LIMIT, FIND_MAX_LIMIT,
+  validateRecord, validateRecords, normalizeRecord, parseJsonl, serializeJsonl, searchRecords, decideStorage,
+  diffRecords, formatDiff, mergeRecords, migrationNotice, MIGRATION_NOTICES
+} from './inventory.js';
+export {
+  InventoryError, inventoryStatus, inventoryEnabled, inventoryPaths, loadInventory, findInventory, validateInventory,
+  checkInventoryRefs, addInventoryRecord, updateInventoryRecord, removeInventoryRecord, INVENTORY_JSONL, INVENTORY_SQLITE
+} from './inventory-store.js';
+export { diffInventory, mergeInventory, readInventoryAtRef } from './inventory-git.js';
+export { migrateInventory, recoverInventory, verifySqliteCopy } from './inventory-migrate.js';
+
 // Pure, browser-safe composition (shared with the web wizard).
 export {
-  composeBootstrap, composeAgentsMd, composeAgentPointer, pointerToRoot,
+  composeBootstrap, composeAgentsMd, composeAgentPointer, pointerToRoot, REUSE_INVENTORY_SECTION,
   composeTrellisConfig, composeNpxCommand, includeSkeletonPath, trellisConfigToYaml,
   PROFILES, PRESETS, ALL_AGENTS, MODULES, RULES
 } from './compose.js';

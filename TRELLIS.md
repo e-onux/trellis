@@ -61,6 +61,10 @@ is enabled, register each capability so a human can run input → see expected v
 Set capability budgets from the profile defaults. Wire `quality/quality-gates.yaml` into CI. Generate the agent
 adapter files (see below) with `AGENTS.md` as canonical. Report anything ambiguous for human review.
 
+Unless `.trellis.yaml` sets `modules.reuse_inventory: false`, include the **reuse inventory** section in
+`AGENTS.md` (search `trellis inventory find` before building a large function or hard algorithm). Do **not**
+scan the repository to seed it; record verified, costly solutions incrementally with `trellis inventory add`.
+
 ---
 
 ## The rules you must follow while working

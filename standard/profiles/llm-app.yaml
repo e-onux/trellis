@@ -30,6 +30,7 @@ modules:
   extensions: true              # model providers and agent tools are extension points
   tech_radar: true              # models change monthly - radar + triggers matter most here
   test_cockpit: true            # cockpit compares expected vs actual model output
+  reuse_inventory: true         # index of costly, verified solutions agents search before re-writing (ADR-0008)
 
 notes: >
   Record expected behavior as invariants and golden sets, not exact-match strings. Re-evaluate model

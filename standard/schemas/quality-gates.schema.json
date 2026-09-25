@@ -38,6 +38,7 @@
               "extension-completeness",
               "maintenance",
               "review-freshness",
+              "reuse-inventory",
               "model-provenance"
             ]
           },

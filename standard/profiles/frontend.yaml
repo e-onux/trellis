@@ -30,6 +30,7 @@ modules:
   extensions: true              # widgets/themes/plugins are common frontend extension points
   tech_radar: true
   test_cockpit: true
+  reuse_inventory: true         # index of costly, verified solutions agents search before re-writing (ADR-0008)
 
 notes: >
   Prefer visual + interaction tests over deep unit tests for presentational capabilities.

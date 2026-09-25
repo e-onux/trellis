@@ -44,6 +44,7 @@ The scaffolded version of this tree lives in [`repo-skeleton/`](./repo-skeleton)
 | Extension contract | `<dir>/extension-registry.yaml` | [`extension-contract.schema.json`](./schemas/extension-contract.schema.json) |
 | Quality gates | `quality/quality-gates.yaml` | [`quality-gates.schema.json`](./schemas/quality-gates.schema.json) |
 | Technology radar | `tech/technology-radar.yaml` | [`technology-radar.schema.json`](./schemas/technology-radar.schema.json) |
+| Reuse inventory record | `tech/reuse-index.jsonl` (one per line) → `tech/reuse-index.sqlite` after migration | [`reuse-inventory-record.schema.json`](./schemas/reuse-inventory-record.schema.json) |
 
 Templates for each live in [`templates/`](./templates).
 
@@ -106,6 +107,7 @@ Evaluated by `trellis audit` and CI. Configured in `quality/quality-gates.yaml`:
 | `regression` | Did previously-working capabilities break? |
 | `extension-completeness` | Are all required registration points updated? |
 | `review-freshness` | Are any ADR/source reviews overdue? |
+| `reuse-inventory` | Is the reuse inventory well-formed, with resolvable code/test/capability/ADR references? |
 
 A gate with `enforced: true` returns a non-zero exit code and fails the build.
 
@@ -132,6 +134,31 @@ Adopt incrementally. `trellis init --preset` chooses a starting level (`light`, 
 - **Evidence over confidence** - an agent's confident assertion never substitutes for a source or a test.
 - **Registration over convention** - required wiring is declared, not left to memory.
 - **Local rules near the extension point** - extension rules live next to the code they govern.
+
+## 11. Reuse inventory
+
+Agents re-write hard algorithms that already exist because nothing tells them the solution is there. The
+**reuse inventory** (module `reuse_inventory`, on by default, `false` in `.trellis.yaml` turns it off) is a
+short index of solutions that were **expensive to build, are worth reusing, and are verified by tests** -
+not a list of every function.
+
+- **Record** - a pointer, never a copy of a contract or code comments: stable `id`, one-line `purpose`,
+  `terms` (search terms and synonyms), code `entry` (`path#symbol`), `tests`, `status`, optional
+  `capability` and `adr`. Template: [`templates/reuse-inventory-record.jsonl`](./templates/reuse-inventory-record.jsonl).
+- **Filling it** - incrementally, as solutions are verified (`trellis inventory add`). Adoption never
+  scans the whole repository or calls a model to seed it.
+- **Searching** - `trellis inventory find <query>` returns at most a few short candidates with the match
+  reason and code/test paths, never the whole inventory. No match does **not** mean no solution: the agent
+  keeps searching the relevant code area. A candidate is a lead; the agent opens its code and tests.
+- **Storage** - `tech/reuse-index.jsonl` while small; at **400 records or 128 KiB** it migrates once to the
+  Git-tracked `tech/reuse-index.sqlite`, which then is the single persistent store (the JSONL is deleted in
+  the same change after a verified copy). The agent tells the user a one-time notice immediately before the
+  migration (`status` → `migration_pending` → notice → `migrate --notified`). Both files present is an
+  explicit `conflict`, resolved only by `trellis inventory recover`.
+- **Review** - the database is binary, so `trellis inventory diff [from] [to]` prints record-level changes
+  and `trellis inventory merge <ref>` merges parallel branches record by record.
+
+Thresholds, measurements and the merge procedure are recorded in this repository's ADR-0008.
 
 ## Versioning
 

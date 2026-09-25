@@ -81,3 +81,44 @@ sources:
         - "Principles, not a checklist; operationalized here as the manifesto + secret-scan gate."
     last_verified: 2026-06-18
     next_review: 2027-06-18
+  - id: source-0005
+    title: "SQLite As An Application File Format"
+    type: official-documentation
+    url: https://www.sqlite.org/appfileformat.html
+    license: public-domain
+    local_copy:
+      path: null
+      sha256: null
+    supports:
+      - ADR-0008
+      - reuse-inventory
+      - migrate-reuse-inventory
+    relevance:
+      claim: >
+        An SQLite database is a single, easily moved file with atomic transactions, incremental
+        updates and a high-level query language - the properties the inventory relies on after
+        migration (one tracked artifact, safe writes, and queries that fetch only candidate rows).
+      confidence: high
+      limitations:
+        - "Written about application documents; it does not address reviewing or merging a binary file in Git - Trellis adds a record-level diff/merge for that."
+    last_verified: 2026-09-25
+    next_review: 2027-09-25
+  - id: source-0006
+    title: "Node.js documentation - SQLite (node:sqlite), added in v22.5.0"
+    type: official-documentation
+    url: https://nodejs.org/api/sqlite.html
+    license: MIT
+    local_copy:
+      path: null
+      sha256: null
+    supports:
+      - ADR-0008
+    relevance:
+      claim: >
+        The built-in node:sqlite module first shipped in Node.js v22.5.0, so it is unavailable on the
+        Node >= 18 range Trellis supports; a WASM driver is needed until the minimum rises.
+      confidence: high
+      limitations:
+        - "Re-check the module's stability index and the project's minimum Node version at review time."
+    last_verified: 2026-09-25
+    next_review: 2027-09-25

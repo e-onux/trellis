@@ -1,0 +1,102 @@
+id: reuse-inventory
+title: Find existing costly solutions before re-writing them (reuse inventory)
+owner: toolchain
+version: 0.1.0
+status: active
+
+intent:
+  description: >
+    Keep a small, repository-tracked index of solutions that are expensive to build and valuable to
+    reuse (hard algorithms, large functions), and answer "does this project already have X?" with a
+    few short, explained candidates - never the whole index. Records are pointers (id, one-line
+    purpose, search terms, code entry, tests, optional capability/ADR), not copies of contracts or
+    comments. Reads and writes whichever single store is current (JSONL, or SQLite after migration).
+
+responsibility:
+  does:
+    - search the inventory and return at most a few ranked candidates with the match reason and code/test paths
+    - add, update and remove records through validated writes (shape, duplicates, resolvable references)
+    - validate the store - broken lines, duplicate ids, missing code/test paths, unresolved capability/ADR links
+    - report the store state (disabled, empty, jsonl, migration_pending with its one-time notice, sqlite, conflict)
+  does_not:
+    - scan the repository or call a model to seed the index (records are added incrementally, once verified)
+    - treat "no match" as "no solution" (the agent must still search the relevant code area)
+    - keep two persistent stores, or choose between them when both exist
+    - require a database service, network access or an embedding service
+
+inputs:
+  repo_root:
+    type: string
+    required: true
+  query:
+    type: string
+    required: false
+  record:
+    type: object
+    required: false
+
+outputs:
+  state:
+    type: string
+  results:
+    type: array
+  hint:
+    type: string
+
+examples:
+  - name: A query that matches a recorded algorithm
+    input:
+      repo_root: ./project-with-inventory
+      query: levenshtein distance
+    expected:
+      results:
+        - id: text.fuzzy-match
+          entry: src/text/fuzzy.js#fuzzyMatch
+  - name: A record whose entry point does not exist
+    input:
+      repo_root: ./project-with-inventory
+      record:
+        id: text.fuzzy-match
+        entry: src/missing.js
+    expected_error:
+      code: BROKEN_REFERENCE
+
+invariants:
+  - find returns at most 5 results in the same shape for JSONL and SQLite, with identical ranking
+  - an empty result carries a hint to search the code area; it never claims no solution exists
+  - when both inventory files exist, find returns no results and writes refuse (conflict is explicit)
+  - a record never carries fields outside the schema (no copied contract or comment text)
+  - JSONL-only repositories never load the SQLite driver
+
+dependencies:
+  internal: []
+  external: [node-sqlite3-wasm]
+
+implementation:
+  - packages/core/src/inventory.js
+  - packages/core/src/inventory-store.js
+
+budgets:
+  max_files: 2
+  max_lines_of_code: 560
+  max_direct_dependencies: 1
+  max_public_operations: 6
+  max_cyclomatic_complexity: 16
+  max_change_reasons: 1
+
+verification:
+  unit: required
+  contract: required
+  regression: required
+
+review:
+  interval: 12 months
+  triggers:
+    - Node 22+ becomes the minimum supported version (reconsider node:sqlite instead of the WASM driver)
+    - agents routinely miss existing solutions despite a hit (revisit ranking or terms guidance)
+    - the reuse-inventory gate is proposed for enforcement
+
+evidence:
+  - source-0005
+decisions:
+  - ADR-0008

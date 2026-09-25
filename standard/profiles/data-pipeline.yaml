@@ -30,6 +30,7 @@ modules:
   extensions: true              # importers/exporters/connectors are pipeline extension points
   tech_radar: true
   test_cockpit: true            # cockpit shows sample-in → sample-out per step
+  reuse_inventory: true         # index of costly, verified solutions agents search before re-writing (ADR-0008)
 
 notes: >
   Use representative fixtures, never raw production data, for cockpit demos.

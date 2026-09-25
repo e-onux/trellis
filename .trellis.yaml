@@ -16,6 +16,7 @@ modules:
   extensions: true
   tech_radar: false
   test_cockpit: false   # not shipped yet (phase 3); kept honest
+  reuse_inventory: true   # tech/reuse-index.jsonl - see ADR-0008
 paths:
   governance: governance
   product: product

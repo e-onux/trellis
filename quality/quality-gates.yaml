@@ -51,3 +51,7 @@ gates:
     description: No ADR/source review is overdue.
     enforced: false
     severity: info
+  - id: reuse-inventory
+    description: The reuse inventory is well-formed - no broken records, duplicate ids, missing code/test paths, unresolved capability/ADR links, or JSONL+SQLite conflict (run `trellis inventory validate`). Advisory until adopters have run it (ADR-0008).
+    enforced: false
+    severity: warning

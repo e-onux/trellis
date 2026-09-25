@@ -10,6 +10,7 @@ import { validateContract } from './contract.js';
 import { budgetCheck } from './budgets.js';
 import { validateExtensions } from './extension.js';
 import { loadConfig, findCapabilityDirs, loadAdrs, loadSources } from './evidence.js';
+import { validateInventory } from './inventory-store.js';
 
 function checkReviewFreshness(adrs, sources, today) {
   const overdue = [];
@@ -56,7 +57,7 @@ function checkReferences(capabilities, adrInfo, sources) {
 }
 
 /**
- * @returns {{ summary, capabilities, reviews, references, extensions, gates, ok, config }}
+ * @returns {{ summary, capabilities, reviews, references, extensions, inventory, gates, ok, config }}
  */
 export function audit(repoRoot, { now } = {}) {
   repoRoot = path.resolve(repoRoot || process.cwd());
@@ -88,6 +89,7 @@ export function audit(repoRoot, { now } = {}) {
   const reviews = checkReviewFreshness(adrInfo.adrs, sources, now ? new Date(now) : new Date());
   const references = checkReferences(capabilities, adrInfo, sources);
   const extensions = validateExtensions(repoRoot);
+  const inventory = validateInventory(repoRoot);
 
   const contractViolations = capabilities.filter((c) => !c.contractOk).length;
   const budgetViolations = capabilities.filter((c) => !c.budgetOk).length;
@@ -104,6 +106,8 @@ export function audit(repoRoot, { now } = {}) {
     evidence: references.evidenceIssues.length,
     decision: references.decisionIssues.length
   };
+  // The reuse inventory is measured only when the module is enabled; disabled → not-evaluated.
+  if (inventory.evaluated) findings['reuse-inventory'] = inventory.issues.length;
 
   const gatesPath = path.join(repoRoot, 'quality', 'quality-gates.yaml');
   const declaredGates = fs.existsSync(gatesPath) ? (readYaml(gatesPath)?.gates || []) : [];
@@ -126,9 +130,10 @@ export function audit(repoRoot, { now } = {}) {
     brokenEvidenceLinks: references.evidenceIssues.length,
     brokenDecisionLinks: references.decisionIssues.length,
     extensionIssues: findings['extension-completeness'],
+    inventoryIssues: inventory.evaluated ? inventory.issues.length : 0,
     gatesNotEvaluated: gates.filter((g) => g.status === 'not-evaluated').length,
     enforcedGateFailures: enforcedFailures.length
   };
 
-  return { summary, capabilities, reviews, references, extensions, gates, ok: enforcedFailures.length === 0, config };
+  return { summary, capabilities, reviews, references, extensions, inventory, gates, ok: enforcedFailures.length === 0, config };
 }

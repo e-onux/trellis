@@ -29,6 +29,7 @@ modules:
   extensions: true
   tech_radar: true
   test_cockpit: true
+  reuse_inventory: true   # search existing hard algorithms before re-writing; set false to turn off (ADR-0008)
 
 # Where governed artifacts live (relative to repo root). Defaults match the standard layout.
 paths:

@@ -56,7 +56,7 @@ export function init(opts = {}) {
   // 3) Emit agent adapters (AGENTS.md canonical + thin pointers).
   const canonical = path.join(repoRoot, 'AGENTS.md');
   if (!fs.existsSync(canonical) || opts.overwrite) {
-    fs.writeFileSync(canonical, composeAgentsMd(profile));
+    fs.writeFileSync(canonical, composeAgentsMd(profile, { modules: config.modules }));
     created.push('AGENTS.md');
   }
   const writtenAgents = [];

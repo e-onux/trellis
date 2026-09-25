@@ -31,6 +31,7 @@ modules:                        # which optional pillars are enabled by default
   extensions: true
   tech_radar: true
   test_cockpit: true            # API capabilities expose request/response in the cockpit
+  reuse_inventory: true         # index of costly, verified solutions agents search before re-writing (ADR-0008)
 
 notes: >
   Destructive/stateful operations should be demoed against a sandbox, never production.

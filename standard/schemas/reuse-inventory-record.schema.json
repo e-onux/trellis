@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/e-onux/trellis/main/standard/schemas/reuse-inventory-record.schema.json",
+  "title": "Trellis Reuse Inventory Record (schema version 1)",
+  "description": "One pointer to a costly, verified, reusable solution. Stored one per line in tech/reuse-index.jsonl, or as a row of tech/reuse-index.sqlite after migration (ADR-0008). A record points to code and tests; it never copies contract text or code comments, so unknown fields are rejected.",
+  "type": "object",
+  "required": ["id", "purpose", "terms", "entry", "tests", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable identifier; never reused for a different solution.",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "purpose": {
+      "type": "string",
+      "description": "One short sentence: what problem this solves.",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "terms": {
+      "type": "array",
+      "description": "Search terms and synonyms (any language) an agent might use to look for this.",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": { "type": "string", "minLength": 1, "maxLength": 40 }
+    },
+    "entry": {
+      "type": "string",
+      "description": "Repository-relative code entry point, optionally with #symbol.",
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(^|/)\\.\\.(/|#|$)).+$",
+      "maxLength": 200
+    },
+    "tests": {
+      "type": "array",
+      "description": "Repository-relative paths of the tests that verify it (only verified solutions are recorded).",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": { "type": "string", "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(^|/)\\.\\.(/|$)).+$", "maxLength": 200 }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "experimental", "deprecated"]
+    },
+    "capability": {
+      "type": "string",
+      "description": "Owning capability id (capabilities/<id>/contract.yaml).",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "adr": {
+      "type": "string",
+      "description": "Decision that explains the approach.",
+      "pattern": "^ADR-\\d{4}$"
+    }
+  }
+}

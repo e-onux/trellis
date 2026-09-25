@@ -20,7 +20,7 @@ capabilities:
     status: active
     owner: toolchain
     path: capabilities/repo-audit
-    depends_on: [contract-validation, budget-check, extension-completeness]
+    depends_on: [contract-validation, budget-check, extension-completeness, reuse-inventory]
   - id: compose-artifacts
     status: active
     owner: toolchain
@@ -41,3 +41,18 @@ capabilities:
     owner: toolchain
     path: capabilities/secret-scan
     depends_on: []
+  - id: reuse-inventory
+    status: active
+    owner: toolchain
+    path: capabilities/reuse-inventory
+    depends_on: []
+  - id: migrate-reuse-inventory
+    status: active
+    owner: toolchain
+    path: capabilities/migrate-reuse-inventory
+    depends_on: [reuse-inventory]
+  - id: review-reuse-inventory
+    status: active
+    owner: toolchain
+    path: capabilities/review-reuse-inventory
+    depends_on: [reuse-inventory]

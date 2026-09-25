@@ -6,7 +6,9 @@ import { execFileSync } from 'node:child_process';
 import {
   init, audit, validateContract, budgetCheck, validateExtensions,
   readYaml, findStandardDir, PROFILES, PRESETS,
-  checkModelProvenance, stampProvenance, PROVENANCE_FILE, scanSecrets, installHooks
+  checkModelProvenance, stampProvenance, PROVENANCE_FILE, scanSecrets, installHooks,
+  inventoryStatus, findInventory, validateInventory, addInventoryRecord, updateInventoryRecord,
+  removeInventoryRecord, migrateInventory, recoverInventory, diffInventory, mergeInventory, formatDiff
 } from '@sidrelabs/trellis-core';
 
 // ---- tiny ANSI helpers (no dependency) ---------------------------------------------------------
@@ -122,8 +124,10 @@ const commands = {
     line('Broken evidence links', s.brokenEvidenceLinks, s.brokenEvidenceLinks === 0);
     line('Broken decision links', s.brokenDecisionLinks, s.brokenDecisionLinks === 0);
     line('Extension issues', s.extensionIssues, s.extensionIssues === 0);
+    if (report.inventory.evaluated) line('Inventory issues', s.inventoryIssues, s.inventoryIssues === 0);
     for (const issue of report.references.evidenceIssues) console.log(`     ${yellow('evidence')} ${issue}`);
     for (const issue of report.references.decisionIssues) console.log(`     ${yellow('decision')} ${issue}`);
+    for (const i of report.inventory.issues) console.log(`     ${yellow('inventory')} ${i.id} ${i.kind}: ${i.message}`);
     console.log('');
     console.log(bold('Gates'));
     for (const g of report.gates) {
@@ -264,8 +268,137 @@ const commands = {
     console.log(dim(`Fill in the contract, add a normal + error example, then: trellis validate`));
   },
 
+  inventory(flags, positional) {
+    const sub = positional[0];
+    const repoRoot = rootOf(flags);
+    const handler = inventoryCommands[sub];
+    if (!handler) fail(`Unknown inventory subcommand "${sub || ''}". Try: ${Object.keys(inventoryCommands).join(' | ')}`);
+    try {
+      handler(repoRoot, flags, positional.slice(1));
+    } catch (e) {
+      if (!e.code) throw e;
+      if (flags.json) console.log(JSON.stringify({ error: e.code, message: e.message, notice: e.notice, checks: e.checks, diff: e.diff }, null, 2));
+      else {
+        console.error(red(`error [${e.code}]: ${e.message}`));
+        if (e.notice) printNotice(e.notice);
+        if (e.diff) for (const l of formatDiff(e.diff)) console.error(`   ${l}`);
+      }
+      process.exitCode = e.code === 'NOTICE_REQUIRED' ? 3 : e.code === 'CONFLICT' || e.code === 'DIVERGED' ? 2 : 1;
+    }
+  },
+
   help() { printHelp(); },
   version() { console.log(`trellis ${pkgVersion()}`); }
+};
+
+// ---- reuse inventory (ADR-0008) ----------------------------------------------------------------
+const csv = (v) => (typeof v === 'string' ? v.split(',').map((x) => x.trim()).filter(Boolean) : undefined);
+
+function recordFromFlags(flags) {
+  const fromJson = typeof flags.record === 'string' ? JSON.parse(flags.record) : {};
+  const rec = { ...fromJson };
+  for (const k of ['id', 'purpose', 'entry', 'status', 'capability', 'adr']) if (typeof flags[k] === 'string') rec[k] = flags[k];
+  for (const k of ['terms', 'tests']) if (typeof flags[k] === 'string') rec[k] = csv(flags[k]);
+  for (const k of csv(flags.clear) || []) rec[k] = null;
+  return rec;
+}
+
+function printNotice(notice) {
+  console.log('');
+  console.log(bold('Migration notice') + dim(`  (tell the user ONCE, before migrating${notice.translate ? ' - translate it to the conversation language' : ''})`));
+  console.log(`  ${notice.text}`);
+  console.log(dim('  Then run: trellis inventory migrate --notified'));
+}
+
+function printStatus(st, flags) {
+  if (flags.json) return console.log(JSON.stringify(st, null, 2));
+  const size = st.records !== undefined ? dim(`  ${st.records} record(s)${st.bytes !== undefined ? `, ${st.bytes} bytes` : ''}`) : '';
+  console.log(`${bold('Reuse inventory')}  state=${cyan(st.state)}${size}`);
+  if (st.message) console.log(yellow(`  ${st.message}`));
+  if (st.stale_temp) console.log(yellow(`  leftover temp file from an interrupted migration (trellis inventory recover removes it)`));
+  if (st.state === 'migration_pending') { console.log(dim(`  threshold crossed: ${st.reasons.join('; ')}`)); printNotice(st.notice); }
+}
+
+const inventoryCommands = {
+  status(repoRoot, flags) { printStatus(inventoryStatus(repoRoot, { lang: flags.lang }), flags); },
+
+  find(repoRoot, flags, rest) {
+    const query = rest.join(' ').trim();
+    if (!query) fail('Provide a query: trellis inventory find "<what you need>" [--limit 3] [--json]');
+    const r = findInventory(repoRoot, query, { limit: flags.limit });
+    if (flags.json) return console.log(JSON.stringify(r, null, 2));
+    for (const x of r.results) {
+      console.log(`${bold(x.id)} ${dim(`[${x.status}] score ${x.score}`)}  ${x.purpose}`);
+      console.log(`   entry ${cyan(x.entry)}  tests ${x.tests.join(', ')}${x.capability ? `  capability ${x.capability}` : ''}${x.adr ? `  ${x.adr}` : ''}`);
+      console.log(dim(`   matched: ${x.matched.join(', ')}`));
+    }
+    if (r.truncated) console.log(dim(`(${r.total_matches - r.results.length} more match(es) not shown - refine the query)`));
+    console.log(dim(r.hint));
+  },
+
+  add(repoRoot, flags) {
+    const r = addInventoryRecord(repoRoot, recordFromFlags(flags));
+    console.log(ok(`Added ${r.record.id}`) + dim(`  (${r.status.format || r.status.state})`));
+    if (r.status.state === 'migration_pending') printStatus(r.status, {});
+  },
+
+  update(repoRoot, flags, rest) {
+    if (!rest[0]) fail('Provide the id: trellis inventory update <id> --purpose ... [--clear capability,adr]');
+    const r = updateInventoryRecord(repoRoot, rest[0], recordFromFlags(flags));
+    console.log(ok(`Updated ${r.record.id}`));
+    if (r.status.state === 'migration_pending') printStatus(r.status, {});
+  },
+
+  remove(repoRoot, flags, rest) {
+    if (!rest[0]) fail('Provide the id: trellis inventory remove <id>');
+    removeInventoryRecord(repoRoot, rest[0]);
+    console.log(ok(`Removed ${rest[0]}`));
+  },
+
+  validate(repoRoot, flags) {
+    const r = validateInventory(repoRoot);
+    if (flags.json) { console.log(JSON.stringify(r, null, 2)); process.exitCode = r.ok ? 0 : 1; return; }
+    if (!r.evaluated) { console.log(dim('Reuse inventory disabled - not evaluated.')); return; }
+    for (const i of r.issues) console.log('  ' + bad(`${i.id}`) + `  ${i.kind}: ${i.message}`);
+    console.log(r.ok ? ok(`Inventory valid (${r.count} record(s), ${r.state})`) : bad(`${r.issues.length} inventory issue(s)`));
+    process.exitCode = r.ok ? 0 : 1;
+  },
+
+  migrate(repoRoot, flags) {
+    const r = migrateInventory(repoRoot, { notified: !!flags.notified, force: !!flags.force });
+    if (flags.json) return console.log(JSON.stringify(r, null, 2));
+    if (!r.migrated) return console.log(dim(r.message));
+    for (const c of r.checks) console.log('  ' + ok(`${c.check}`) + dim(`  ${c.detail}`));
+    console.log(ok(`Migrated ${r.records} record(s) to ${r.sqlite}; removed ${r.removed}`));
+    console.log(dim(`Commit both changes together: git add -A ${path.posix.dirname(r.sqlite)}`));
+  },
+
+  recover(repoRoot, flags) {
+    const keep = flags.keep === 'sqlite' || flags.keep === 'jsonl' ? flags.keep : undefined;
+    const r = recoverInventory(repoRoot, { keep });
+    if (flags.json) return console.log(JSON.stringify(r, null, 2));
+    console.log(r.resolved ? ok(`${r.action} → state=${r.state}`) : dim(r.message));
+  },
+
+  diff(repoRoot, flags, rest) {
+    const d = diffInventory(repoRoot, { from: rest[0] || 'HEAD', to: rest[1] });
+    if (flags.json) return console.log(JSON.stringify(d, null, 2));
+    console.log(bold(`Inventory diff`) + dim(`  ${d.from} (${d.fromSource}) → ${d.to} (${d.toSource})`));
+    const lines = formatDiff(d);
+    for (const l of lines) console.log(`  ${l.startsWith('+') ? green(l) : l.startsWith('-') ? red(l) : yellow(l)}`);
+    if (!lines.length) console.log(dim('  no record changes'));
+  },
+
+  merge(repoRoot, flags, rest) {
+    if (!rest[0]) fail('Provide the other branch: trellis inventory merge <ref> [--prefer ours|theirs] [--dry-run]');
+    const prefer = flags.prefer === 'ours' || flags.prefer === 'theirs' ? flags.prefer : undefined;
+    const r = mergeInventory(repoRoot, rest[0], { prefer, dryRun: !!flags['dry-run'] });
+    if (flags.json) { console.log(JSON.stringify(r, null, 2)); process.exitCode = r.conflicts.length && !prefer ? 2 : 0; return; }
+    for (const l of formatDiff(r.changes)) console.log(`  ${l}`);
+    for (const c of r.conflicts) console.log('  ' + bad(`conflict ${c.id}`) + dim('  changed differently on both branches'));
+    if (r.conflicts.length && !prefer) { console.log(red('Not written. Resolve with --prefer ours|theirs, or edit one side and re-run.')); process.exitCode = 2; return; }
+    console.log(r.written ? ok('Merged inventory written - run `trellis inventory validate`, then `git add`.') : dim('Dry run - nothing written.'));
+  }
 };
 
 // ---- helpers -----------------------------------------------------------------------------------
@@ -318,6 +451,8 @@ ${bold('Commands')}
   ${cyan('hook install')}         Install git hooks (model-stamp + pre-push check) ${dim('[--force --only <hook> --root <dir>]')}
   ${cyan('extension validate')}   Check extension registration completeness    ${dim('[<id> --root <dir>]')}
   ${cyan('capability add')}       Scaffold a new capability                    ${dim('<id> [--root <dir>]')}
+  ${cyan('inventory find')}       Search reusable solutions (bounded results)  ${dim('<query> [--limit 3 --json]')}
+  ${cyan('inventory')} ${dim('status | add | update <id> | remove <id> | validate | migrate --notified | recover | diff [from] [to] | merge <ref>')}
   ${cyan('help')} | ${cyan('version')}
 
 ${bold('Examples')}
