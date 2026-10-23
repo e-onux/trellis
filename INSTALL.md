@@ -19,7 +19,7 @@ Download `TRELLIS.md` from the Trellis repository and write it to the **project 
 current working directory - the project being governed, not a temporary location):
 
 ```
-https://raw.githubusercontent.com/e-onux/trellis/main/TRELLIS.md
+https://raw.githubusercontent.com/e-onux/trellis/main/trellis/TRELLIS.md
 ```
 
 ## Step 2 - Analyze the project

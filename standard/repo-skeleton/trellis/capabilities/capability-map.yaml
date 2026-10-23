@@ -6,5 +6,5 @@ capabilities: []
 #   - id: calculate-shipping-cost
 #     status: active
 #     owner: checkout
-#     path: capabilities/calculate-shipping-cost
+#     path: trellis/capabilities/calculate-shipping-cost
 #     depends_on: [pricing-table, destination-zone-resolver]

@@ -1,6 +1,10 @@
 # Trellis project configuration - this repository is governed by its own standard.
-version: "0.1"
-standard: "0.1"
+version: "0.2"
+standard: "0.2"
+
+# All governed artifacts live under this directory (see ADR-0010); `paths` below are relative to it.
+root: trellis
+
 profile: backend
 preset: standard
 agents:

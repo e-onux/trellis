@@ -4,7 +4,7 @@ Thanks for your interest. Trellis is both an **open standard** and a **toolchain
 
 ## Ground rules
 
-Trellis is self-hosting: this repository follows its own standard. Before contributing, skim [`TRELLIS.md`](./TRELLIS.md) and [`standard/README.md`](./standard/README.md).
+Trellis is self-hosting: this repository follows its own standard. Before contributing, skim [`trellis/TRELLIS.md`](./trellis/TRELLIS.md) and [`standard/README.md`](./standard/README.md).
 
 The single most important rule of the project is also the first rule we apply to ourselves:
 
@@ -16,7 +16,7 @@ The single most important rule of the project is also the first rule we apply to
 
 Changes to schemas, templates, or the directory model affect everyone. They require:
 
-- an **ADR** in `tech/decisions/` (use [`standard/templates/adr-template.md`](./standard/templates/adr-template.md)) describing the change, alternatives, and review triggers;
+- an **ADR** in `trellis/tech/decisions/` (use [`standard/templates/adr-template.md`](./standard/templates/adr-template.md)) describing the change, alternatives, and review triggers;
 - a worked diff to at least one schema in `standard/schemas/` plus a matching template update;
 - backward-compatibility notes (schemas are versioned).
 

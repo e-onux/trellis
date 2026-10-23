@@ -2,12 +2,18 @@
 
 ## Unreleased
 
+- Consolidated layout (ADR-0010): all governed artifacts now live under a single `trellis/` directory
+  (`.trellis.yaml` becomes `trellis/trellis.yaml` and gains a `root:` key; `paths:` are relative to it),
+  so adopting Trellis no longer scatters governance files beside code. The repo root keeps only the
+  agent-native adapters, and `CLAUDE.md` now uses an `@AGENTS.md` import so Claude Code loads the rules
+  automatically. The layout is fully config-driven (core hardcodes no governed path) and the legacy
+  top-level layout is still read, so existing repos keep working. Standard version 0.2.
 - Model-provenance hooks (ADR-0007): `trellis hook install` writes a post-commit hook that stamps the
   authoring model (from `TRELLIS_MODEL`, set by the harness) and a pre-push hook that runs
   `trellis model-check` - so model policy works end to end: declare, auto-stamp, block before push.
-- Model policy (ADR-0005): declare which models may author code in `governance/model-policy.yaml`;
+- Model policy (ADR-0005): declare which models may author code in `trellis/governance/model-policy.yaml`;
   `trellis model-check` is a fail-closed gate (provenance recorded out-of-band in
-  `.trellis/provenance.jsonl`, so commit messages stay clean) and `trellis model-stamp` records it -
+  `trellis/provenance.jsonl`, so commit messages stay clean) and `trellis model-stamp` records it -
   so a degraded fallback model cannot silently ship code.
 - Security manifesto (ADR-0006): a profile-aware, evidence-backed `governance/security-manifesto.md`
   of what an agent must watch for, plus one enforced rule - `trellis secret-scan` (fail-closed,

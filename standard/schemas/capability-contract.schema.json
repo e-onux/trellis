@@ -231,7 +231,7 @@
       "items": {
         "type": "string"
       },
-      "description": "Source ids (see sources/bibliography.yaml) backing this capability's expected behavior."
+      "description": "Source ids (see trellis/sources/bibliography.yaml) backing this capability's expected behavior."
     },
     "decisions": {
       "type": "array",

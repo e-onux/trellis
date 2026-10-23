@@ -11,3 +11,4 @@ Append-only index of this repository's own ADRs. Supersede, never delete.
 | [ADR-0005](./ADR-0005-model-provenance-gate.md) | Govern which models may author code (model-provenance gate) | accepted | 2026-06-18 | 2027-06-18 |
 | [ADR-0006](./ADR-0006-security-manifesto.md) | Add a security manifesto and an enforceable secret-scan gate | accepted | 2026-06-18 | 2027-06-18 |
 | [ADR-0007](./ADR-0007-model-provenance-hooks.md) | Ship git hooks for model-provenance stamping and pre-push enforcement | accepted | 2026-06-28 | 2027-06-28 |
+| [ADR-0010](./ADR-0010-consolidated-trellis-layout.md) | Consolidate all governed artifacts under a single trellis/ directory | accepted | 2026-10-22 | 2027-10-22 |

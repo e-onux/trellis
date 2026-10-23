@@ -1,4 +1,4 @@
-# The Trellis Standard - v0.1
+# The Trellis Standard - v0.2
 
 > Status: **draft**. Human-readable here; machine-checkable via [`schemas/`](./schemas).
 > This document defines the directory model, artifacts, evidence graph, and quality gates that make up Trellis.
@@ -19,31 +19,40 @@ Two halves, one standard:
 
 ## 2. Directory model
 
-A Trellis-governed repository contains (subset depending on adoption level):
+A Trellis-governed repository keeps **all** governance under a single `trellis/` directory, so no governed file
+sits beside application code. Only the agent-adapter files stay at the repo root, because each tool auto-loads its
+own: `AGENTS.md` (canonical) plus thin pointers (`CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md`,
+`.cursor/rules/`, `.windsurf/rules/`).
 
 ```
-governance/   constitution, engineering principles, agent authority, definition of done, change & approval policy
-product/      vision, constraints, domain model, terminology, non-goals, user journeys
-tech/         overview, architecture map, technology radar, upgrade/refactor/dependency policy, decisions/ (ADRs)
-sources/      MANIFEST, bibliography.yaml, and (license-permitting) local copies - the evidence store
-extensions/   EXTENSIONS.md, extension-registry.yaml, extension-contract schema, per-type rules
-capabilities/ index, capability-map.yaml, and one folder per capability (contract + examples + tests + evidence)
-quality/      testing strategy, security policy, performance budgets, architecture invariants, quality-gates.yaml
-lifecycle/    review calendar, technical debt, migrations, deprecations, upgrade reviews, refactor proposals
+trellis/
+  trellis.yaml   project config: profile, preset, agents, enabled modules, and `root` + `paths`
+  TRELLIS.md     bootstrap manifesto (agent-independent)
+  governance/    constitution, engineering principles, agent authority, definition of done, change & approval policy
+  product/       vision, constraints, domain model, terminology, non-goals, user journeys
+  tech/          overview, architecture map, technology radar, upgrade/refactor/dependency policy, decisions/ (ADRs)
+  sources/       MANIFEST, bibliography.yaml, and (license-permitting) local copies - the evidence store
+  extensions/    EXTENSIONS.md, extension-registry.yaml, extension-contract schema, per-type rules
+  capabilities/  index, capability-map.yaml, and one folder per capability (contract + examples + tests + evidence)
+  quality/       testing strategy, security policy, performance budgets, architecture invariants, quality-gates.yaml
+  lifecycle/     review calendar, technical debt, migrations, deprecations, upgrade reviews, refactor proposals
 ```
 
-The scaffolded version of this tree lives in [`repo-skeleton/`](./repo-skeleton) and is what `trellis init` copies in.
+(subset depending on adoption level.) `trellis.yaml`'s `root:` names this directory and `paths:` name each area
+within it, so the location is configurable; a repository written before this consolidation - areas at the top
+level and `root` absent - is still read correctly (see ADR-0010). The scaffolded version of this tree lives in
+[`repo-skeleton/`](./repo-skeleton) and is what `trellis init` copies in.
 
 ## 3. Artifacts & schemas
 
 | Artifact | File(s) | Schema |
 |---|---|---|
-| Capability contract | `capabilities/<id>/contract.yaml` | [`capability-contract.schema.json`](./schemas/capability-contract.schema.json) |
-| Architecture decision | `tech/decisions/ADR-XXXX-*.md` (YAML front matter) | [`adr.schema.json`](./schemas/adr.schema.json) |
-| Source / evidence | `sources/bibliography.yaml` entries | [`source.schema.json`](./schemas/source.schema.json) |
+| Capability contract | `trellis/capabilities/<id>/contract.yaml` | [`capability-contract.schema.json`](./schemas/capability-contract.schema.json) |
+| Architecture decision | `trellis/tech/decisions/ADR-XXXX-*.md` (YAML front matter) | [`adr.schema.json`](./schemas/adr.schema.json) |
+| Source / evidence | `trellis/sources/bibliography.yaml` entries | [`source.schema.json`](./schemas/source.schema.json) |
 | Extension contract | `<dir>/extension-registry.yaml` | [`extension-contract.schema.json`](./schemas/extension-contract.schema.json) |
-| Quality gates | `quality/quality-gates.yaml` | [`quality-gates.schema.json`](./schemas/quality-gates.schema.json) |
-| Technology radar | `tech/technology-radar.yaml` | [`technology-radar.schema.json`](./schemas/technology-radar.schema.json) |
+| Quality gates | `trellis/quality/quality-gates.yaml` | [`quality-gates.schema.json`](./schemas/quality-gates.schema.json) |
+| Technology radar | `trellis/tech/technology-radar.yaml` | [`technology-radar.schema.json`](./schemas/technology-radar.schema.json) |
 
 Templates for each live in [`templates/`](./templates).
 
@@ -62,7 +71,7 @@ Does the new behavior fit responsibility.does?
 ```
 
 This is the project's defining stance: **the agent has an obligation to *not* write code** when limits are hit,
-and to produce a proposal (split / refactor / ADR / migration) instead. See `governance/agent-authority.md`.
+and to produce a proposal (split / refactor / ADR / migration) instead. See `trellis/governance/agent-authority.md`.
 
 ## 5. Evidence graph
 
@@ -91,7 +100,7 @@ get forgotten. Each extension point carries a directory-local `EXTENSIONS.md` (h
 
 ## 8. Quality gates
 
-Evaluated by `trellis audit` and CI. Configured in `quality/quality-gates.yaml`:
+Evaluated by `trellis audit` and CI. Configured in `trellis/quality/quality-gates.yaml`:
 
 | Gate | Asks |
 |---|---|
@@ -136,4 +145,4 @@ Adopt incrementally. `trellis init --preset` chooses a starting level (`light`, 
 ## Versioning
 
 The standard is versioned independently of the toolchain. Breaking schema changes bump the standard's minor
-version pre-1.0 and require an ADR in this repository's own `tech/decisions/`.
+version pre-1.0 and require an ADR in this repository's own `trellis/tech/decisions/`.

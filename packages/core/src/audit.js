@@ -10,6 +10,7 @@ import { validateContract } from './contract.js';
 import { budgetCheck } from './budgets.js';
 import { validateExtensions } from './extension.js';
 import { loadConfig, findCapabilityDirs, loadAdrs, loadSources } from './evidence.js';
+import { areaDir } from './config.js';
 
 function checkReviewFreshness(adrs, sources, today) {
   const overdue = [];
@@ -61,10 +62,9 @@ function checkReferences(capabilities, adrInfo, sources) {
 export function audit(repoRoot, { now } = {}) {
   repoRoot = path.resolve(repoRoot || process.cwd());
   const config = loadConfig(repoRoot);
-  const capsDir = config.paths?.capabilities || 'capabilities';
 
   const capabilities = [];
-  for (const dir of findCapabilityDirs(repoRoot, capsDir)) {
+  for (const dir of findCapabilityDirs(repoRoot, config)) {
     const contract = readYaml(path.join(dir, 'contract.yaml'));
     const validation = validateContract(contract);
     const budget = budgetCheck(dir, { repoRoot });
@@ -83,8 +83,8 @@ export function audit(repoRoot, { now } = {}) {
     });
   }
 
-  const adrInfo = loadAdrs(repoRoot);
-  const sources = loadSources(repoRoot);
+  const adrInfo = loadAdrs(repoRoot, config);
+  const sources = loadSources(repoRoot, config);
   const reviews = checkReviewFreshness(adrInfo.adrs, sources, now ? new Date(now) : new Date());
   const references = checkReferences(capabilities, adrInfo, sources);
   const extensions = validateExtensions(repoRoot);
@@ -105,7 +105,7 @@ export function audit(repoRoot, { now } = {}) {
     decision: references.decisionIssues.length
   };
 
-  const gatesPath = path.join(repoRoot, 'quality', 'quality-gates.yaml');
+  const gatesPath = areaDir(repoRoot, config, 'quality', 'quality-gates.yaml');
   const declaredGates = fs.existsSync(gatesPath) ? (readYaml(gatesPath)?.gates || []) : [];
   const gates = declaredGates.map((g) => {
     const measured = g.id in findings;

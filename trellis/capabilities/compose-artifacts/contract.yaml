@@ -7,7 +7,7 @@ status: active
 intent:
   description: >
     Generate the artifacts a governed repository needs: the tailored bootstrap manifesto,
-    canonical AGENTS.md, thin per-tool pointer files, the .trellis.yaml config and the npx
+    canonical AGENTS.md, thin per-tool pointer files, the trellis/trellis.yaml config and the npx
     command. One browser-safe engine feeds both the CLI scaffold and the web wizard so their
     output can never drift.
 

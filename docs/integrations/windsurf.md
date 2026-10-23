@@ -10,8 +10,8 @@ instructions.
 |---|---|
 | `AGENTS.md` | Canonical instructions: the nine Trellis rules, profile, links to the standard |
 | `.windsurf/rules/trellis.md` | Thin pointer → `AGENTS.md`, with trigger `always_on` |
-| `.trellis.yaml` | Profile, preset, agents, enabled modules |
-| `governance/ product/ tech/ sources/ extensions/ capabilities/ quality/ lifecycle/` | The governed tree |
+| `trellis/trellis.yaml` | Profile, preset, agents, enabled modules |
+| `trellis/{governance,product,tech,sources,extensions,capabilities,quality,lifecycle}/` | The governed tree |
 
 The rule file carries front matter:
 
@@ -29,7 +29,7 @@ inside it use a `../../` prefix because the file sits two levels below the repo 
 **Option A - agent-native (zero install).**
 
 ```bash
-curl -o TRELLIS.md https://raw.githubusercontent.com/e-onux/trellis/main/TRELLIS.md
+curl -o TRELLIS.md https://raw.githubusercontent.com/e-onux/trellis/main/trellis/TRELLIS.md
 ```
 
 Then tell Cascade:
@@ -47,18 +47,18 @@ node packages/cli/bin/trellis.js init --profile backend --preset standard --agen
 ## How Windsurf consumes it
 
 Cascade loads always-on workspace rules at the start of every conversation. The Trellis rule contains no
-actual rules - it sends the agent to `AGENTS.md`, which carries the nine rules and references `TRELLIS.md`
+actual rules - it sends the agent to `AGENTS.md`, which carries the nine rules and references `trellis/TRELLIS.md`
 and the [standard](../../standard/README.md). To change a rule, edit `AGENTS.md` - never the pointer.
 
 ## Working under Trellis rules
 
-- Before changing code, the agent reads the relevant `capabilities/<id>/contract.yaml` and current ADRs in
-  `tech/decisions/`.
+- Before changing code, the agent reads the relevant `trellis/capabilities/<id>/contract.yaml` and current
+  ADRs in `trellis/tech/decisions/`.
 - New behavior goes through the budget decision rule: within `responsibility.does` and within budget →
   extend; over budget → stop and write a refactor/split proposal; outside `does` → propose a new capability.
 - Stop conditions produce a **proposal instead of code** - that is a valid deliverable under Trellis.
 - Substantive work ends with the completion report defined in
-  [`TRELLIS.md`](../../TRELLIS.md#completion-report-always).
+  [`trellis/TRELLIS.md`](../../trellis/TRELLIS.md#completion-report-always).
 
 > **Tip:** run `trellis audit` in CI. The gates then hold regardless of which agent made the change.
 

@@ -6,7 +6,8 @@ import { execFileSync } from 'node:child_process';
 import {
   init, audit, validateContract, budgetCheck, validateExtensions,
   readYaml, findStandardDir, PROFILES, PRESETS,
-  checkModelProvenance, stampProvenance, PROVENANCE_FILE, scanSecrets, installHooks
+  checkModelProvenance, stampProvenance, scanSecrets, installHooks,
+  loadConfig, areaDir, provenancePath
 } from '@sidrelabs/trellis-core';
 
 // ---- tiny ANSI helpers (no dependency) ---------------------------------------------------------
@@ -39,8 +40,7 @@ function rootOf(flags) {
 
 // ---- capability discovery ----------------------------------------------------------------------
 function discoverCapabilities(repoRoot) {
-  const cfg = fs.existsSync(path.join(repoRoot, '.trellis.yaml')) ? readYaml(path.join(repoRoot, '.trellis.yaml')) : {};
-  const base = path.join(repoRoot, cfg.paths?.capabilities || 'capabilities');
+  const base = areaDir(repoRoot, loadConfig(repoRoot), 'capabilities');
   if (!fs.existsSync(base)) return [];
   return fs.readdirSync(base, { withFileTypes: true })
     .filter((e) => e.isDirectory())
@@ -61,7 +61,7 @@ const commands = {
     console.log(bold(`\n🌿 Initializing Trellis`) + dim(`  profile=${profile} preset=${preset}`));
     const res = init({ repoRoot, profile, preset, agents, overwrite: !!flags.overwrite });
     console.log(ok(`Scaffolded ${res.created.length} files into ${path.relative(process.cwd(), repoRoot) || '.'}`));
-    console.log(dim(`   governance/ product/ tech/ sources/ extensions/ capabilities/ quality/ lifecycle/`));
+    console.log(dim(`   trellis/ (governance, product, tech, sources, extensions, capabilities, quality, lifecycle)`));
     console.log(ok(`Agent adapters: ${cyan('AGENTS.md')} (canonical) + ${res.agents.join(', ') || 'none'}`));
     console.log(`\nNext: add your first capability →  ${cyan('trellis capability add <id>')}`);
     console.log(`Then verify →  ${cyan('trellis audit')}\n`);
@@ -75,10 +75,10 @@ const commands = {
       return;
     }
     const caps = discoverCapabilities(repoRoot);
-    if (!caps.length) { console.log(warn('No capabilities found (looked in capabilities/).')); return; }
+    if (!caps.length) { console.log(warn('No capabilities found (looked in trellis/capabilities/).')); return; }
     console.log(bold(`\nValidating ${caps.length} capability contract(s)\n`));
     let failed = 0;
-    for (const dir of caps) failed += validateOne(dir) ? 0 : 1;
+    for (const dir of caps) failed += validateOne(dir, repoRoot) ? 0 : 1;
     console.log('');
     console.log(failed ? bad(`${failed} capability/capabilities failed validation`) : ok('All contracts valid'));
     process.exitCode = failed ? 1 : 0;
@@ -182,7 +182,8 @@ const commands = {
     try { commit = execFileSync('git', ['rev-parse', ref], { cwd: repoRoot, encoding: 'utf8' }).trim(); } catch { /* not a git ref; record as given */ }
     const agent = typeof flags.agent === 'string' ? flags.agent : undefined;
     stampProvenance(repoRoot, { commit, model, agent });
-    console.log(ok(`Stamped ${commit.slice(0, 9)} → ${model}${agent ? ` (${agent})` : ''}`) + dim(`  in ${PROVENANCE_FILE}`));
+    const provRel = path.relative(repoRoot, provenancePath(repoRoot, loadConfig(repoRoot)));
+    console.log(ok(`Stamped ${commit.slice(0, 9)} → ${model}${agent ? ` (${agent})` : ''}`) + dim(`  in ${provRel}`));
   },
 
   'secret-scan'(flags) {
@@ -245,8 +246,7 @@ const commands = {
     if (!id || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id)) fail('Provide a kebab-case id: trellis capability add <id>');
     const repoRoot = rootOf(flags);
     const standardDir = findStandardDir();
-    const cfg = fs.existsSync(path.join(repoRoot, '.trellis.yaml')) ? readYaml(path.join(repoRoot, '.trellis.yaml')) : {};
-    const dir = path.join(repoRoot, cfg.paths?.capabilities || 'capabilities', id);
+    const dir = areaDir(repoRoot, loadConfig(repoRoot), 'capabilities', id);
     if (fs.existsSync(dir)) fail(`Capability already exists: ${path.relative(repoRoot, dir)}`);
     fs.mkdirSync(path.join(dir, 'examples'), { recursive: true });
     fs.mkdirSync(path.join(dir, 'tests'), { recursive: true });
@@ -264,12 +264,12 @@ const commands = {
 };
 
 // ---- helpers -----------------------------------------------------------------------------------
-function validateOne(dir) {
+function validateOne(dir, repoRoot = path.resolve(dir, '..', '..')) {
   const contractPath = path.join(dir, 'contract.yaml');
   if (!fs.existsSync(contractPath)) { console.log(bad(`${path.basename(dir)} - no contract.yaml`)); return false; }
   const contract = readYaml(contractPath);
   const v = validateContract(contract);
-  const b = budgetCheck(dir, { repoRoot: path.resolve(dir, '..', '..') });
+  const b = budgetCheck(dir, { repoRoot });
   const id = contract.id || path.basename(dir);
   if (v.ok && b.ok) console.log(ok(`${id}`));
   else console.log(bad(`${id}`));

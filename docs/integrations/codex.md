@@ -9,8 +9,8 @@ read `AGENTS.md` directly, such as Jules, Aider and Zed.
 | File | Role |
 |---|---|
 | `AGENTS.md` | Canonical instructions: the nine Trellis rules, profile, links to the standard |
-| `.trellis.yaml` | Profile, preset, agents, enabled modules |
-| `governance/ product/ tech/ sources/ extensions/ capabilities/ quality/ lifecycle/` | The governed tree |
+| `trellis/trellis.yaml` | Profile, preset, agents, enabled modules |
+| `trellis/{governance,product,tech,sources,extensions,capabilities,quality,lifecycle}/` | The governed tree |
 
 Passing `--agents codex` is accepted but intentionally produces no extra file - Codex already reads the
 canonical source.
@@ -20,7 +20,7 @@ canonical source.
 **Option A - agent-native (zero install).**
 
 ```bash
-curl -o TRELLIS.md https://raw.githubusercontent.com/e-onux/trellis/main/TRELLIS.md
+curl -o TRELLIS.md https://raw.githubusercontent.com/e-onux/trellis/main/trellis/TRELLIS.md
 ```
 
 Then tell Codex:
@@ -43,13 +43,13 @@ instructions with zero indirection. To change a rule, edit `AGENTS.md` - there i
 
 ## Working under Trellis rules
 
-- Before changing code, the agent reads the relevant `capabilities/<id>/contract.yaml` and current ADRs in
-  `tech/decisions/`.
+- Before changing code, the agent reads the relevant `trellis/capabilities/<id>/contract.yaml` and current
+  ADRs in `trellis/tech/decisions/`.
 - New behavior goes through the budget decision rule: within `responsibility.does` and within budget →
   extend; over budget → stop and write a refactor/split proposal; outside `does` → propose a new capability.
 - Stop conditions produce a **proposal instead of code** - that is a valid deliverable under Trellis.
 - Substantive work ends with the completion report defined in
-  [`TRELLIS.md`](../../TRELLIS.md#completion-report-always).
+  [`trellis/TRELLIS.md`](../../trellis/TRELLIS.md#completion-report-always).
 
 > **Tip:** run `trellis audit` in CI. The gates then hold regardless of which agent made the change.
 

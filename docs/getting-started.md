@@ -6,13 +6,13 @@ Two ways to adopt Trellis. Both end with the same governed structure.
 
 1. Put `TRELLIS.md` in your repo:
    ```bash
-   curl -o TRELLIS.md https://raw.githubusercontent.com/e-onux/trellis/main/TRELLIS.md
+   curl -o TRELLIS.md https://raw.githubusercontent.com/e-onux/trellis/main/trellis/TRELLIS.md
    ```
 2. Tell your agent (Claude Code, Codex, Copilot, Cursor, Windsurf, Gemini CLI...):
    > "Read `TRELLIS.md` and bootstrap this repository according to it."
 
-The agent scaffolds governance, extracts decisions into ADRs, discovers capabilities, and generates the
-agent adapter files - with `AGENTS.md` as the canonical source.
+The agent scaffolds governance under `trellis/`, extracts decisions into ADRs, discovers capabilities, and
+generates the agent adapter files - with `AGENTS.md` as the canonical source.
 
 ## B) CLI (deterministic)
 
@@ -54,4 +54,4 @@ trellis audit            # whole-repo health + quality gates (CI-friendly exit c
 
 A capability is done when it has a contract, a normal + error example, passing tests, a human-verifiable
 surface, respects its budget, preserves invariants, and links current ADRs/sources. See
-`governance/definition-of-done.md` in your scaffolded repo.
+`trellis/governance/definition-of-done.md` in your scaffolded repo.

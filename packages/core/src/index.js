@@ -14,6 +14,7 @@ export { scanSecrets, detectSecrets } from './secret-scan.js';
 export { installHooks, HOOKS } from './hooks.js';
 export { parseYaml, stringifyYaml, readYaml, extractYamlBlock } from './yaml.js';
 export { findStandardDir } from './util.js';
+export { loadConfig, areaDir, provenancePath, governedRoot, DEFAULT_PATHS, CONFIG_LOCATIONS } from './config.js';
 
 // Pure, browser-safe composition (shared with the web wizard).
 export {
@@ -22,4 +23,4 @@ export {
   PROFILES, PRESETS, ALL_AGENTS, MODULES, RULES
 } from './compose.js';
 
-export const STANDARD_VERSION = '0.1';
+export const STANDARD_VERSION = '0.2';

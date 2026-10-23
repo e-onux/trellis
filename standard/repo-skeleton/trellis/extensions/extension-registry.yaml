@@ -18,9 +18,9 @@ contracts: []
 #         - { path: config/payment.schema.yaml, operation: add-config-schema, required: true }
 #         - { path: .env.example, operation: document-environment, required_if: extension.requires_environment }
 #         - { path: docs/payments/providers.md, operation: add-documentation, required: true }
-#         - { path: capabilities/payment-processing/contract.yaml, operation: update-capability, required: true }
+#         - { path: trellis/capabilities/payment-processing/contract.yaml, operation: update-capability, required: true }
 #         - { path: CHANGELOG.md, operation: add-entry, required: true }
 #     required_artifacts: [implementation, unit-tests, contract-tests, error-scenarios, configuration-example, user-documentation]
 #     removal:
-#       required_updates: [payments/provider-registry.yaml, config/payment.schema.yaml, .env.example, docs/payments/providers.md, capabilities/payment-processing/contract.yaml, CHANGELOG.md]
+#       required_updates: [payments/provider-registry.yaml, config/payment.schema.yaml, .env.example, docs/payments/providers.md, trellis/capabilities/payment-processing/contract.yaml, CHANGELOG.md]
 #     validation: { command: trellis extension validate payment-provider }
