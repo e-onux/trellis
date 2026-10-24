@@ -24,31 +24,35 @@
 
 ### Phase 1 - Scaffold governance
 
-Create the directory model (omit pillars disabled by the profile/preset):
+Create a single `trellis/` directory and scaffold the governed model inside it (omit pillars disabled by the
+profile/preset) - no governance file belongs beside the code:
 
 ```
-governance/  product/  tech/  tech/decisions/  sources/  extensions/  capabilities/  quality/  lifecycle/
+trellis/
+  governance/  product/  tech/  tech/decisions/  sources/  extensions/  capabilities/  quality/  lifecycle/
+  trellis.yaml   # project config: root + paths, profile, preset, agents, enabled modules
+  TRELLIS.md     # this manifesto, kept in the repo
 ```
 
 Seed each from the Trellis templates/skeleton: constitution, engineering-principles, agent-authority,
 definition-of-done, change-policy, human-approval-policy; product vision/constraints/domain/terminology/non-goals;
 tech overview/architecture-map/technology-radar/upgrade/refactoring/dependency policies; sources MANIFEST +
 bibliography; extensions EXTENSIONS.md + registry; quality policies + `quality-gates.yaml`; lifecycle calendar +
-debt. Write a `.trellis.yaml` capturing profile, preset, agents and enabled modules.
+debt. Write `trellis/trellis.yaml` capturing `root: trellis`, profile, preset, agents and enabled modules.
 
 ### Phase 2 - Extract decisions (brownfield)
 
 For each significant existing decision (datastore, framework, key dependency, architectural pattern):
 create an **ADR** with `context`, `decision`, `alternatives`, `assumptions`, `consequences`, and
 `review.triggers`. If you cannot find the rationale, mark it `under-review` and record a "missing evidence"
-note - **do not invent justification**. Link sources in `sources/bibliography.yaml`.
+note - **do not invent justification**. Link sources in `trellis/sources/bibliography.yaml`.
 
 ### Phase 3 - Discover capabilities
 
 Identify meaningful, user/system-visible behaviors (e.g. user-registration, calculate-shipping-cost,
-classify-document). For each, create `capabilities/<id>/` with a `contract.yaml` (intent, `responsibility.does` /
+classify-document). For each, create `trellis/capabilities/<id>/` with a `contract.yaml` (intent, `responsibility.does` /
 `does_not`, inputs, outputs, ≥1 normal + ≥1 error example, invariants, dependencies, `budgets`, `verification`,
-`review`). Register them in `capabilities/capability-map.yaml`. Report capabilities you found but did **not**
+`review`). Register them in `trellis/capabilities/capability-map.yaml`. Report capabilities you found but did **not**
 contract yet.
 
 ### Phase 4 - Tests & cockpit
@@ -58,7 +62,7 @@ is enabled, register each capability so a human can run input → see expected v
 
 ### Phase 5 - Budgets, gates & adapters
 
-Set capability budgets from the profile defaults. Wire `quality/quality-gates.yaml` into CI. Generate the agent
+Set capability budgets from the profile defaults. Wire `trellis/quality/quality-gates.yaml` into CI. Generate the agent
 adapter files (see below) with `AGENTS.md` as canonical. Report anything ambiguous for human review.
 
 Unless `.trellis.yaml` sets `modules.reuse_inventory: false`, include the **reuse inventory** section in
@@ -69,7 +73,7 @@ scan the repository to seed it; record verified, costly solutions incrementally 
 
 ## The rules you must follow while working
 
-These mirror `governance/`. They are not optional.
+These mirror `trellis/governance/`. They are not optional.
 
 1. **Capability-first.** Every feature maps to a capability contract. No contract → not a feature.
 2. **Done ≠ code written.** A capability is done only when it has a contract, examples, passing tests, a
@@ -109,6 +113,7 @@ Implementation completed.
 
 ## Agent adapters to generate
 
+These live at the **repo root** (each tool auto-loads its own) and point into `trellis/`:
 `AGENTS.md` (canonical) + thin pointers: `CLAUDE.md`, `.github/copilot-instructions.md`,
 `.cursor/rules/trellis.mdc`, `.windsurf/rules/trellis.md`, `GEMINI.md`. Pointers must not restate rules.
 

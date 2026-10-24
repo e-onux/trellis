@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateContract, budgetCheck, init, audit, readYaml } from '../src/index.js';
+import { validateContract, budgetCheck, init, audit, readYaml, areaDir, provenancePath } from '../src/index.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, '..', '..', '..');
@@ -66,9 +66,13 @@ test('init scaffolds a governed repo and audit passes on it', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'trellis-init-'));
   const res = init({ repoRoot: tmp, profile: 'backend', preset: 'standard', agents: ['claude', 'codex', 'cursor'] });
   assert.ok(res.created.includes('AGENTS.md'));
-  assert.ok(fs.existsSync(path.join(tmp, 'governance', 'constitution.md')));
-  assert.ok(fs.existsSync(path.join(tmp, '.trellis.yaml')));
+  // Governance is consolidated under trellis/, not scattered at the repo root.
+  assert.ok(fs.existsSync(path.join(tmp, 'trellis', 'governance', 'constitution.md')));
+  assert.ok(fs.existsSync(path.join(tmp, 'trellis', 'trellis.yaml')));
+  assert.ok(!fs.existsSync(path.join(tmp, 'governance')), 'governance must not sit at the repo root');
+  // Agent-native files stay at the root so each tool auto-loads them.
   assert.ok(fs.existsSync(path.join(tmp, 'CLAUDE.md')));
+  assert.ok(fs.readFileSync(path.join(tmp, 'CLAUDE.md'), 'utf8').includes('@AGENTS.md'), 'CLAUDE.md imports AGENTS.md');
   assert.ok(fs.existsSync(path.join(tmp, '.cursor', 'rules', 'trellis.mdc')));
   assert.ok(!fs.existsSync(path.join(tmp, 'codex.md')), 'codex uses AGENTS.md natively');
 
@@ -80,7 +84,7 @@ test('init scaffolds a governed repo and audit passes on it', () => {
 test('audit on the example capability (copied into a scaffold) is healthy', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'trellis-audit-'));
   init({ repoRoot: tmp, profile: 'backend', preset: 'standard' });
-  const dest = path.join(tmp, 'capabilities', 'calculate-shipping-cost');
+  const dest = path.join(tmp, 'trellis', 'capabilities', 'calculate-shipping-cost');
   fs.cpSync(exampleDir, dest, { recursive: true });
   const report = audit(tmp);
   assert.equal(report.summary.capabilities, 1);
@@ -128,7 +132,7 @@ test('budgetCheck measures real imports instead of trusting declarations', () =>
 test('audit flags broken evidence and decision references', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'trellis-refs-'));
   init({ repoRoot: tmp, profile: 'backend', preset: 'standard' });
-  const dir = path.join(tmp, 'capabilities', 'refs-cap');
+  const dir = path.join(tmp, 'trellis', 'capabilities', 'refs-cap');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'contract.yaml'), [
     'id: refs-cap', 'title: T', 'version: 1.0.0', 'status: active',
@@ -149,4 +153,38 @@ test('audit flags broken evidence and decision references', () => {
   const byId = Object.fromEntries(report.gates.map((g) => [g.id, g]));
   assert.equal(byId.evidence.status, 'failed');
   assert.equal(byId.decision.status, 'failed');
+});
+
+test('areaDir resolves the consolidated layout and the legacy top-level layout', () => {
+  const root = '/repo';
+  // Consolidated: every governed area lives under `trellis/`.
+  const nested = { root: 'trellis', paths: { governance: 'governance', capabilities: 'capabilities' } };
+  assert.equal(areaDir(root, nested, 'governance', 'model-policy.yaml'), path.join('/repo', 'trellis', 'governance', 'model-policy.yaml'));
+  assert.equal(areaDir(root, nested, 'capabilities'), path.join('/repo', 'trellis', 'capabilities'));
+  assert.equal(provenancePath(root, nested), path.join('/repo', 'trellis', 'provenance.jsonl'));
+  // Legacy: no `root` → top-level dirs, so pre-consolidation repos keep resolving.
+  const legacy = {};
+  assert.equal(areaDir(root, legacy, 'tech', 'decisions'), path.join('/repo', 'tech', 'decisions'));
+  assert.equal(provenancePath(root, legacy), path.join('/repo', '.trellis', 'provenance.jsonl'));
+});
+
+test('audit still reads a legacy top-level layout (back-compat)', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'trellis-legacy-'));
+  // A pre-consolidation repo: .trellis.yaml at the root, no `root` key, governed dirs at top level.
+  fs.writeFileSync(path.join(tmp, '.trellis.yaml'), 'version: "0.1"\nprofile: backend\npreset: standard\n');
+  const dir = path.join(tmp, 'capabilities', 'legacy-cap');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'contract.yaml'), [
+    'id: legacy-cap', 'title: T', 'version: 1.0.0', 'status: active',
+    'intent: { description: x }',
+    'responsibility: { does: [x], does_not: [y] }',
+    'inputs: { a: { type: string } }', 'outputs: { b: { type: string } }',
+    'examples:',
+    '  - { name: ok, input: { a: x }, expected: { b: y } }',
+    '  - { name: boom, input: { a: "" }, expected_error: { code: BAD } }',
+    'budgets: { max_files: 5 }',
+    'verification: { contract: required }', ''
+  ].join('\n'));
+  const report = audit(tmp);
+  assert.equal(report.summary.capabilities, 1, 'legacy top-level capabilities/ must still be found');
 });

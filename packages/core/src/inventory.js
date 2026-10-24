@@ -2,7 +2,7 @@
 // solutions that are expensive to build and valuable to reuse, so an agent can find an existing
 // algorithm before re-writing it. Storage (JSONL → SQLite), filesystem and git access live in
 // inventory-store.js / inventory-migrate.js; this module only shapes, validates and ranks records.
-// See tech/decisions/ADR-0008-reuse-inventory.md.
+// See trellis/tech/decisions/ADR-0008-reuse-inventory.md.
 
 export const INVENTORY_SCHEMA_VERSION = 1;
 export const INVENTORY_STATUSES = ['active', 'experimental', 'deprecated'];

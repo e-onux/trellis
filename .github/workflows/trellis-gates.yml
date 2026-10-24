@@ -41,7 +41,7 @@ jobs:
       - name: Audit demo project (scaffold + example, enforced gates must pass)
         run: |
           node packages/cli/bin/trellis.js init --root /tmp/demo --profile backend --preset standard --agents claude,codex
-          cp -r examples/calculate-shipping-cost /tmp/demo/capabilities/
+          cp -r examples/calculate-shipping-cost /tmp/demo/trellis/capabilities/
           node packages/cli/bin/trellis.js audit --root /tmp/demo
 
       - name: Pack smoke test (simulates npx install outside the monorepo)

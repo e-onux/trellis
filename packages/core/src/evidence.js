@@ -3,20 +3,19 @@
 // integrity) and the visualization (graph view + Obsidian export) read them through one place.
 // Node-only: this module reads the repository from disk. The pure graph-shaping step lives in
 // buildEvidenceGraph (see graph.js) and takes the loaded model as plain data.
+//
+// All on-disk locations resolve through config.js (`areaDir`), so the governed layout - top-level
+// (legacy) or nested under `trellis/` - is a configuration choice, not hardcoded here.
 import { fs, path, walkFiles } from './util.js';
 import { readYaml, extractYamlBlock } from './yaml.js';
 import { buildEvidenceGraph } from './graph.js';
+import { loadConfig, areaDir } from './config.js';
 
-const DEFAULT_CAPS_DIR = 'capabilities';
+export { loadConfig };
 
-export function loadConfig(repoRoot) {
-  const p = path.join(repoRoot, '.trellis.yaml');
-  return fs.existsSync(p) ? readYaml(p) : {};
-}
-
-/** Capability directories (under capsDir) that carry a contract.yaml. */
-export function findCapabilityDirs(repoRoot, capsDir = DEFAULT_CAPS_DIR) {
-  const base = path.join(repoRoot, capsDir);
+/** Capability directories (under the configured capabilities area) that carry a contract.yaml. */
+export function findCapabilityDirs(repoRoot, config = loadConfig(repoRoot)) {
+  const base = areaDir(repoRoot, config, 'capabilities');
   if (!fs.existsSync(base)) return [];
   return fs.readdirSync(base, { withFileTypes: true })
     .filter((e) => e.isDirectory())
@@ -24,11 +23,11 @@ export function findCapabilityDirs(repoRoot, capsDir = DEFAULT_CAPS_DIR) {
     .filter((d) => fs.existsSync(path.join(d, 'contract.yaml')));
 }
 
-/** All ADRs under tech/decisions/, with their parsed YAML front matter. */
-export function loadAdrs(repoRoot) {
+/** All ADRs under the configured tech/decisions area, with their parsed YAML front matter. */
+export function loadAdrs(repoRoot, config = loadConfig(repoRoot)) {
   const ids = new Set();
   const adrs = [];
-  const dir = path.join(repoRoot, 'tech', 'decisions');
+  const dir = areaDir(repoRoot, config, 'tech', 'decisions');
   for (const file of walkFiles(dir)) {
     if (!file.endsWith('.md')) continue;
     const doc = extractYamlBlock(fs.readFileSync(file, 'utf8'));
@@ -38,8 +37,8 @@ export function loadAdrs(repoRoot) {
 }
 
 /** The bibliography source records. */
-export function loadSources(repoRoot) {
-  const bib = path.join(repoRoot, 'sources', 'bibliography.yaml');
+export function loadSources(repoRoot, config = loadConfig(repoRoot)) {
+  const bib = areaDir(repoRoot, config, 'sources', 'bibliography.yaml');
   return fs.existsSync(bib) ? (readYaml(bib)?.sources || []) : [];
 }
 
@@ -62,16 +61,15 @@ function capabilitySummary(dir, repoRoot) {
 export function loadEvidenceModel(repoRoot) {
   repoRoot = path.resolve(repoRoot || '.');
   const cfg = loadConfig(repoRoot);
-  const capsDir = cfg.paths?.capabilities || DEFAULT_CAPS_DIR;
-  const capabilities = findCapabilityDirs(repoRoot, capsDir).map((d) => capabilitySummary(d, repoRoot));
-  const decisions = loadAdrs(repoRoot).adrs.map(({ id, doc, file }) => ({
+  const capabilities = findCapabilityDirs(repoRoot, cfg).map((d) => capabilitySummary(d, repoRoot));
+  const decisions = loadAdrs(repoRoot, cfg).adrs.map(({ id, doc, file }) => ({
     id,
     title: doc.title || id,
     status: doc.status || null,
     evidence: (doc.evidence || []).map((e) => (e && e.id ? e.id : e)).filter(Boolean),
     path: path.relative(repoRoot, file)
   }));
-  const sources = loadSources(repoRoot).map((s) => ({
+  const sources = loadSources(repoRoot, cfg).map((s) => ({
     id: s.id,
     title: s.title || s.id,
     type: s.type || null,

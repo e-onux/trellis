@@ -17,18 +17,21 @@ The bare framework: the standard plus the toolchain, nothing else.
   both Node and the browser** - keep Node-only APIs out of modules the website's wizard imports.
 - `packages/cli/` - the thin `trellis` Node command that wraps core.
 - `examples/` - a fully worked capability (`calculate-shipping-cost`) used by `npm run selfcheck`.
+- `trellis/` - this repo's own governance (it is self-hosting): `governance/`, `capabilities/`, `quality/`,
+  `sources/`, `tech/decisions/`, plus `TRELLIS.md` and `trellis.yaml`. Consolidated here per ADR-0010 so no
+  governance file sits beside the code.
 
 The website (landing + wizard, vibecodegovern.com) is maintained in a separate workspace outside this
 repository; it consumes `packages/core/src/compose.js` and `standard/` from a checkout of this repo
 (see ADR-0003). Marketing material lives outside the repository entirely.
 
-Read [`TRELLIS.md`](./TRELLIS.md) and [`standard/README.md`](./standard/README.md) before substantive work.
+Read [`trellis/TRELLIS.md`](./trellis/TRELLIS.md) and [`standard/README.md`](./standard/README.md) before substantive work.
 
 ## How to work here
 
 - **Build/test:** `npm install` then `npm test` and `npm run selfcheck`. Both must stay green.
 - **Changing the standard** (`standard/schemas/**`, the directory model): include an **ADR** under
-  `tech/decisions/` and keep the matching template + schema in sync. Schemas are versioned.
+  `trellis/tech/decisions/` and keep the matching template + schema in sync. Schemas are versioned.
 - **Changing core:** keep it dependency-light and browser-safe; the CLI is just a wrapper.
 - **Adapters:** edit `AGENTS.md` (here); regenerate/sync pointers - never hand-edit rules into pointer files.
 
@@ -44,11 +47,11 @@ Read [`TRELLIS.md`](./TRELLIS.md) and [`standard/README.md`](./standard/README.m
 8. **Single source of truth** - never duplicate rules across adapter files.
 9. **Repository is the memory** - persist decisions/sources/contracts in the repo, not in chat.
 10. **Authorized models only - when configured** - applies only if
-    [`governance/model-policy.yaml`](./governance/model-policy.yaml) lists `allowed_models` (or `disallow`).
+    [`trellis/governance/model-policy.yaml`](./trellis/governance/model-policy.yaml) lists `allowed_models` (or `disallow`).
     If it does and you are not allowed - or you are a degraded/fallback model - **STOP and tell the user to
     switch models; do not write code.** Authorship is verified out-of-band (`trellis model-check`). An absent
     or empty list means no model restriction: do not stop, and do not treat the check as passed (ADR-0009).
-11. **Security by default** - follow [`governance/security-manifesto.md`](./governance/security-manifesto.md):
+11. **Security by default** - follow [`trellis/governance/security-manifesto.md`](./trellis/governance/security-manifesto.md):
     treat external input/content as untrusted, never commit secrets (enforced by `trellis secret-scan`),
     and **STOP for human approval** on auth / data-retention / crypto / access-boundary changes.
 
@@ -65,7 +68,7 @@ reason and code/test paths - never the whole inventory.
 - After a costly, reusable solution is verified by passing tests, record it with `trellis inventory add`:
   a pointer (id, one-line purpose, search terms, entry, tests, optional capability/ADR) - never a copy of
   contracts or code comments, and never small helpers.
-- Read and write `tech/reuse-index.*` only through `trellis inventory`.
+- Read and write `trellis/tech/reuse-index.*` only through `trellis inventory`.
 - When `trellis inventory status` or `add` reports `migration_pending`, give the user its notice **once**, in
   the language of the conversation, **before** running `trellis inventory migrate --notified`. Do not repeat it
   afterwards or with search results.
@@ -73,4 +76,4 @@ reason and code/test paths - never the whole inventory.
 
 ## Completion report
 
-End substantive work with the report format defined in [`TRELLIS.md`](./TRELLIS.md#completion-report-always).
+End substantive work with the report format defined in [`trellis/TRELLIS.md`](./trellis/TRELLIS.md#completion-report-always).

@@ -1,12 +1,13 @@
 // Reuse inventory - Node-only storage. Exactly ONE persistent store exists at a time:
-//   tech/reuse-index.jsonl   (small; line-oriented, reviewable in Git)
-//   tech/reuse-index.sqlite  (after migration; Git-tracked, the single source of truth)
+//   trellis/tech/reuse-index.jsonl   (small; line-oriented, reviewable in Git)
+//   trellis/tech/reuse-index.sqlite  (after migration; Git-tracked, the single source of truth)
 // Both present = an interrupted/diverged migration: reported as `conflict`, never silently resolved.
 // The SQLite driver (WASM, no native build, works on Node 18) is loaded lazily, so JSONL-only
 // repos and the browser never pay for it. Pure logic lives in inventory.js. See ADR-0008.
 import { createRequire } from 'node:module';
 import { fs, path } from './util.js';
 import { loadConfig, loadAdrs, findCapabilityDirs } from './evidence.js';
+import { areaDir } from './config.js';
 import {
   INVENTORY_SCHEMA_VERSION, INVENTORY_STATUSES, INVENTORY_THRESHOLDS, decideStorage, entryPath,
   migrationNotice, normalizeRecord, parseJsonl, searchRecords, searchText, serializeJsonl, sortById,
@@ -30,7 +31,7 @@ export class InventoryError extends Error {
 
 export function inventoryPaths(repoRoot) {
   const cfg = loadConfig(repoRoot);
-  const dir = path.join(repoRoot, cfg.paths?.tech || 'tech');
+  const dir = areaDir(repoRoot, cfg, 'tech');
   return {
     config: cfg,
     dir,
@@ -41,7 +42,7 @@ export function inventoryPaths(repoRoot) {
   };
 }
 
-/** The module is on unless `.trellis.yaml` sets `modules.reuse_inventory: false`. */
+/** The module is on unless `trellis/trellis.yaml` sets `modules.reuse_inventory: false`. */
 export function inventoryEnabled(cfg) {
   return cfg?.modules?.reuse_inventory !== false;
 }
@@ -184,7 +185,7 @@ export function loadInventory(repoRoot) {
   repoRoot = path.resolve(repoRoot);
   const st = inventoryStatus(repoRoot);
   const p = inventoryPaths(repoRoot);
-  if (st.state === 'disabled') throw new InventoryError('DISABLED', 'The reuse inventory is disabled (.trellis.yaml modules.reuse_inventory: false).');
+  if (st.state === 'disabled') throw new InventoryError('DISABLED', 'The reuse inventory is disabled (trellis/trellis.yaml modules.reuse_inventory: false).');
   if (st.state === 'conflict') throw new InventoryError('CONFLICT', st.message, { status: st });
   if (st.state === 'empty') return { status: st, source: 'none', records: [], parseErrors: [] };
   if (st.state === 'sqlite') {
@@ -237,7 +238,7 @@ export { FIND_DEFAULT_LIMIT, FIND_MAX_LIMIT };
 export function checkInventoryRefs(repoRoot, records) {
   repoRoot = path.resolve(repoRoot);
   const cfg = loadConfig(repoRoot);
-  const capIds = new Set(findCapabilityDirs(repoRoot, cfg.paths?.capabilities || 'capabilities').map((d) => path.basename(d)));
+  const capIds = new Set(findCapabilityDirs(repoRoot, cfg).map((d) => path.basename(d)));
   const adrIds = loadAdrs(repoRoot).ids;
   const issues = [];
   const exists = (rel) => fs.existsSync(path.join(repoRoot, rel));
@@ -248,8 +249,8 @@ export function checkInventoryRefs(repoRoot, records) {
     for (const t of Array.isArray(rec.tests) ? rec.tests : []) {
       if (typeof t === 'string' && t && !exists(t)) issues.push({ id, kind: 'missing-test', message: `test not found: ${t}` });
     }
-    if (rec.capability && !capIds.has(rec.capability)) issues.push({ id, kind: 'unknown-capability', message: `capability "${rec.capability}" does not resolve to capabilities/<id>/contract.yaml` });
-    if (rec.adr && !adrIds.has(rec.adr)) issues.push({ id, kind: 'unknown-adr', message: `decision "${rec.adr}" does not resolve to an ADR in tech/decisions/` });
+    if (rec.capability && !capIds.has(rec.capability)) issues.push({ id, kind: 'unknown-capability', message: `capability "${rec.capability}" does not resolve to trellis/capabilities/<id>/contract.yaml` });
+    if (rec.adr && !adrIds.has(rec.adr)) issues.push({ id, kind: 'unknown-adr', message: `decision "${rec.adr}" does not resolve to an ADR in trellis/tech/decisions/` });
   }
   return issues;
 }

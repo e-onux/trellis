@@ -2,28 +2,34 @@
 
 ## Unreleased
 
-- Model allow-list is optional (ADR-0009, amends ADR-0005/ADR-0007): `governance/model-policy.yaml` ships
-  an empty `allowed_models`; until it names a model (or a `disallow` entry) `trellis model-check` reports
+- Consolidated layout (ADR-0010): all governed artifacts now live under a single `trellis/` directory
+  (`.trellis.yaml` becomes `trellis/trellis.yaml` and gains a `root:` key; `paths:` are relative to it),
+  so adopting Trellis no longer scatters governance files beside code. The repo root keeps only the
+  agent-native adapters, and `CLAUDE.md` now uses an `@AGENTS.md` import so Claude Code loads the rules
+  automatically. The layout is fully config-driven (core hardcodes no governed path) and the legacy
+  top-level layout is still read, so existing repos keep working. Standard version 0.2.
+- Model allow-list is optional (ADR-0009, amends ADR-0005/ADR-0007): `trellis/governance/model-policy.yaml`
+  ships an empty `allowed_models`; until it names a model (or a `disallow` entry) `trellis model-check` reports
   **not evaluated** (`ok: null`) - never a silent pass, never a block - and the pre-push hook lets the push
   through. Old `your-*-model` placeholders no longer count as configuration. AGENTS.md rule 10 (and a new
   conditional rule in the generated AGENTS.md) applies only when a list is configured; the
   `model-provenance` gate is declared `enforced: false` and joins the quality-gates schema and skeleton,
-  which also gains an opt-in `governance/model-policy.yaml` template.
-- Reuse inventory (ADR-0008): a new `reuse_inventory` module (on by default; `false` in `.trellis.yaml`
+  which also gains an opt-in `trellis/governance/model-policy.yaml` template.
+- Reuse inventory (ADR-0008): a new `reuse_inventory` module (on by default; `false` in `trellis/trellis.yaml`
   turns it off) keeps a short index of costly, verified solutions so agents search before re-writing a
   hard algorithm. `trellis inventory find` returns at most a few short candidates with match reasons and
   code/test paths; `add`/`update`/`remove`/`validate` keep it honest. It starts as
-  `tech/reuse-index.jsonl` and, at 400 records or 128 KiB (measured - see the ADR), migrates once into
-  the Git-tracked `tech/reuse-index.sqlite` after a verified copy, announced to the user once beforehand.
+  `trellis/tech/reuse-index.jsonl` and, at 400 records or 128 KiB (measured - see the ADR), migrates once into
+  the Git-tracked `trellis/tech/reuse-index.sqlite` after a verified copy, announced to the user once beforehand.
   `inventory diff`/`merge` give record-level review and merging of the binary file. The generated
   `AGENTS.md` gains a "Reuse inventory" section; the advisory `reuse-inventory` gate joins `trellis audit`.
   Adds `node-sqlite3-wasm` (WASM, Node 18+, no native build) to core, loaded only after migration.
 - Model-provenance hooks (ADR-0007): `trellis hook install` writes a post-commit hook that stamps the
   authoring model (from `TRELLIS_MODEL`, set by the harness) and a pre-push hook that runs
   `trellis model-check` - so model policy works end to end: declare, auto-stamp, block before push.
-- Model policy (ADR-0005): declare which models may author code in `governance/model-policy.yaml`;
+- Model policy (ADR-0005): declare which models may author code in `trellis/governance/model-policy.yaml`;
   `trellis model-check` is a fail-closed gate (provenance recorded out-of-band in
-  `.trellis/provenance.jsonl`, so commit messages stay clean) and `trellis model-stamp` records it -
+  `trellis/provenance.jsonl`, so commit messages stay clean) and `trellis model-stamp` records it -
   so a degraded fallback model cannot silently ship code.
 - Security manifesto (ADR-0006): a profile-aware, evidence-backed `governance/security-manifesto.md`
   of what an agent must watch for, plus one enforced rule - `trellis secret-scan` (fail-closed,

@@ -22,9 +22,9 @@ decisions are conditional and reviewed.
 
 - **Test cockpit MVP**: the user-facing surface where non-developers run a capability's examples
   and compare expected vs actual output
-- Architecture drift detection (wire the `drift` gate to `quality/architecture-invariants.md`)
+- Architecture drift detection (wire the `drift` gate to `trellis/quality/architecture-invariants.md`)
 - Capability health score (tests + budgets + evidence freshness + drift in one number)
-- Monorepo profile and nested `.trellis.yaml` support
+- Monorepo profile and nested `trellis/trellis.yaml` support
 - Import scanning for more languages (Go, Rust, Java, PHP)
 
 ## Out of scope (non-goals)

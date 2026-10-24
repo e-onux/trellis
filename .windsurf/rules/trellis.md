@@ -6,7 +6,7 @@ trigger: always_on
 
 This repository uses **AGENTS.md** as the single, canonical source of agent instructions.
 
-Read and follow [`AGENTS.md`](../../AGENTS.md). It points to [`TRELLIS.md`](../../TRELLIS.md) and
-[`standard/README.md`](../../standard/README.md).
+Read and follow [`AGENTS.md`](../../AGENTS.md). It points to [`trellis/TRELLIS.md`](../../trellis/TRELLIS.md)
+and [`standard/README.md`](../../standard/README.md).
 
 Thin pointer by design (Trellis rule #8: single source of truth). Do not duplicate rules here.

@@ -1,5 +1,5 @@
 # Trellis capability contract - validated against standard/schemas/capability-contract.schema.json
-# Copy into capabilities/<id>/contract.yaml and fill in. Delete the comments you don't need.
+# Copy into trellis/capabilities/<id>/contract.yaml and fill in. Delete the comments you don't need.
 
 id: my-capability                # kebab-case, unique in the project
 title: Human readable title

@@ -11,7 +11,7 @@
 A capability-first, evidence-governed standard that keeps AI-generated software understandable, testable and maintainable as it grows - it brings memory, decisions, boundaries and evidence into your repo, so AI-assisted projects can grow without losing control.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
-[![Standard](https://img.shields.io/badge/spec-Trellis%20Standard%20v0.1-2ea44f.svg)](./standard/README.md)
+[![Standard](https://img.shields.io/badge/spec-Trellis%20Standard%20v0.2-2ea44f.svg)](./standard/README.md)
 [![Agent-independent](https://img.shields.io/badge/agents-Claude%20Code%20·%20Codex%20·%20Copilot%20·%20Cursor%20·%20Windsurf%20·%20Gemini-555.svg)](#multi-platform-support)
 
 ### 🌐 [**vibecodegovern.com**](https://vibecodegovern.com) - try the wizard
@@ -44,19 +44,19 @@ It is built from parts that exist separately elsewhere - but combines them into 
 
 | Pillar | What it does | Where it lives |
 |---|---|---|
-| 🧠 **Repository-native memory** | Decisions, sources and contracts live in the repo, not in chat history | `governance/`, `tech/` |
-| 📐 **Capability contracts** | Every meaningful behavior has a machine-checkable input/output contract | `capabilities/*/contract.yaml` |
+| 🧠 **Repository-native memory** | Decisions, sources and contracts live in the repo, not in chat history | `trellis/governance/`, `trellis/tech/` |
+| 📐 **Capability contracts** | Every meaningful behavior has a machine-checkable input/output contract | `trellis/capabilities/*/contract.yaml` |
 | 📊 **Capability budgets** | Technical *and* semantic limits (files, LOC, deps, responsibilities) - enforced | `budgets:` + `trellis budget-check` |
-| 🔍 **Evidence graph** | `Source → Claim → Decision → Capability → Test → User validation` | `sources/`, ADR `evidence:` |
-| 🗂️ **Decision lifecycle** | ADRs with assumptions, review intervals and re-evaluation triggers | `tech/decisions/` |
+| 🔍 **Evidence graph** | `Source → Claim → Decision → Capability → Test → User validation` | `trellis/sources/`, ADR `evidence:` |
+| 🗂️ **Decision lifecycle** | ADRs with assumptions, review intervals and re-evaluation triggers | `trellis/tech/decisions/` |
 | 🧩 **Extension contracts** | Directory-local rules listing the files an extension *must* register | `EXTENSIONS.md`, `extension-registry.yaml` |
 | 🖥️ **User-facing test cockpit** | Non-engineers compare expected vs actual output per capability | `/__capabilities` *(Phase 2)* |
-| 🛑 **Obligation to *not* write code** | Machine-readable stop conditions; agent proposes split/refactor/ADR instead | `governance/agent-authority.md` |
-| 🚦 **Quality gates** | CI gates: contract, budget, drift, evidence, regression | `.github/workflows/`, `quality/quality-gates.yaml` |
-| ⏳ **Technology lifecycle** | Upgrade & refactor triggers so decisions don't silently rot | `tech/technology-radar.md` |
-| 🤖 **Model policy** (optional) | Opt in by listing which models may author code; a fail-closed gate then blocks a degraded fallback | `governance/model-policy.yaml` + `trellis model-check` |
-| 🔒 **Security manifesto** | Profile-aware security principles + an enforced no-committed-secrets gate | `governance/security-manifesto.md` + `trellis secret-scan` |
-| ♻️ **Reuse inventory** | Agents search a short index of costly, verified solutions before re-writing a hard algorithm (bounded answers; JSONL → Git-tracked SQLite as it grows) | `tech/reuse-index.*` + `trellis inventory find` |
+| 🛑 **Obligation to *not* write code** | Machine-readable stop conditions; agent proposes split/refactor/ADR instead | `trellis/governance/agent-authority.md` |
+| 🚦 **Quality gates** | CI gates: contract, budget, drift, evidence, regression | `.github/workflows/`, `trellis/quality/quality-gates.yaml` |
+| ⏳ **Technology lifecycle** | Upgrade & refactor triggers so decisions don't silently rot | `trellis/tech/technology-radar.yaml` |
+| 🤖 **Model policy** (optional) | Opt in by listing which models may author code; a fail-closed gate then blocks a degraded fallback | `trellis/governance/model-policy.yaml` + `trellis model-check` |
+| 🔒 **Security manifesto** | Profile-aware security principles + an enforced no-committed-secrets gate | `trellis/governance/security-manifesto.md` + `trellis secret-scan` |
+| ♻️ **Reuse inventory** | Agents search a short index of costly, verified solutions before re-writing a hard algorithm (bounded answers; JSONL → Git-tracked SQLite as it grows) | `trellis/tech/reuse-index.*` + `trellis inventory find` |
 
 ## Multi-platform support
 
@@ -92,12 +92,12 @@ with only the governed structure - no installation artifacts.
 Copy the bootstrap manifesto into your repo and tell your agent to follow it:
 
 ```bash
-curl -o TRELLIS.md https://raw.githubusercontent.com/e-onux/trellis/main/TRELLIS.md
+curl -o TRELLIS.md https://raw.githubusercontent.com/e-onux/trellis/main/trellis/TRELLIS.md
 ```
 
 > "Read `TRELLIS.md` and bootstrap this repository according to it."
 
-The agent reads [`TRELLIS.md`](./TRELLIS.md), analyzes the repo, and scaffolds the governance directories, capability contracts and agent adapters itself.
+The agent reads [`TRELLIS.md`](./trellis/TRELLIS.md), analyzes the repo, and scaffolds the governance directory (`trellis/`), capability contracts and agent adapters itself.
 
 ### Option B - CLI (deterministic / CI-friendly)
 
@@ -122,7 +122,7 @@ npx @sidrelabs/trellis inventory find "fuzzy match"   # reuse inventory: find an
 
 The evidence graph (`Source → Decision → Capability`) is not just validated in CI - you can look at it.
 Trellis exposes it as **data** (`loadEvidenceGraph` in `@sidrelabs/trellis-core`); rendering lives in a
-separate tool so this repo stays bare (see [ADR-0004](./tech/decisions/ADR-0004-evidence-graph-visualization.md)):
+separate tool so this repo stays bare (see [ADR-0004](./trellis/tech/decisions/ADR-0004-evidence-graph-visualization.md)):
 
 [**🔭 Trelliscope**](https://github.com/e-onux/trelliscope) (`@sidrelabs/trelliscope`) renders that
 graph as a self-contained HTML app or an Obsidian vault - supporting Obsidian without Trellis depending
@@ -149,10 +149,9 @@ Level 6  Lifecycle + upgrade automation      (decisions that don't rot)
 ## Repository layout
 
 ```
-trellis/
-├── TRELLIS.md            ← single bootstrap manifesto (agent-independent)
+<repo root>
 ├── AGENTS.md             ← canonical agent instructions
-├── CLAUDE.md  GEMINI.md  .cursor/  .windsurf/  .github/   ← per-tool adapters
+├── CLAUDE.md  GEMINI.md  .cursor/  .windsurf/  .github/   ← per-tool adapters (thin pointers)
 ├── standard/             ← the open standard
 │   ├── README.md         ← spec overview + adoption levels
 │   ├── schemas/          ← JSON Schemas (contract, ADR, source, gates, radar, extension, reuse-inventory record)
@@ -164,7 +163,10 @@ trellis/
 │   └── cli/              ← `trellis` command (wraps core)
 ├── examples/
 │   └── calculate-shipping-cost/   ← a fully worked capability
-├── capabilities/  tech/decisions/  sources/  quality/   ← this repo governed by its own standard
+├── trellis/              ← this repo governed by its own standard — all governance in one place
+│   ├── trellis.yaml      ← project config (root + paths, profile, preset, modules)
+│   ├── TRELLIS.md        ← single bootstrap manifesto (agent-independent)
+│   └── governance/  capabilities/  tech/decisions/  sources/  quality/
 └── docs/
     ├── comparison.md      ← how Trellis relates to Spec Kit, OpenSpec, BMAD, Kiro, Tessl, AGENTS.md
     └── integrations/      ← per-tool guides (Claude Code, Codex, Copilot, Cursor, Windsurf, Gemini)
@@ -177,8 +179,8 @@ standard + toolchain.
 ## Self-hosted
 
 Trellis applies its own standard to this repository: the engine's behaviors are
-[capability contracts](./capabilities/index.md) whose budgets measure the real source files,
-decisions live in [ADRs](./tech/decisions/index.md) backed by [sources](./sources/bibliography.yaml),
+[capability contracts](./trellis/capabilities/index.md) whose budgets measure the real source files,
+decisions live in [ADRs](./trellis/tech/decisions/index.md) backed by [sources](./trellis/sources/bibliography.yaml),
 and CI runs `trellis audit --root .` on every push. A worked end-to-end example app lives at
 [e-onux/trellis-example-app](https://github.com/e-onux/trellis-example-app).
 

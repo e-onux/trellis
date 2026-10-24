@@ -1,7 +1,11 @@
 # Trellis project configuration.
 # `trellis init` fills these from your choices (--profile / --preset / --agents / --modules).
-version: "0.1"
-standard: "0.1"
+version: "0.2"
+standard: "0.2"
+
+# All governed artifacts live under this one directory, so the repo root stays free of governance
+# files sitting next to code. `paths` below name each area relative to it.
+root: trellis
 
 # Project profile: backend | frontend | data-pipeline | llm-app
 profile: backend
@@ -31,7 +35,7 @@ modules:
   test_cockpit: true
   reuse_inventory: true   # search existing hard algorithms before re-writing; set false to turn off (ADR-0008)
 
-# Where governed artifacts live (relative to repo root). Defaults match the standard layout.
+# Where governed artifacts live (relative to `root`). Defaults match the standard layout.
 paths:
   governance: governance
   product: product

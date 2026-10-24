@@ -5,24 +5,27 @@
 // (allowed_models or disallow). An absent/empty list - or one still holding the template
 // placeholders - is reported as not evaluated: never a silent pass, never a block.
 //
-// Provenance is stored out-of-band in .trellis/provenance.jsonl (one JSON record per line:
-// { "commit": "<sha>", "model": "<id>", "agent": "<id>", "at": "<iso>" }) so commit messages
+// Provenance is stored out-of-band in the governed root (trellis/provenance.jsonl; legacy
+// .trellis/provenance.jsonl) as one JSON record per line:
+// { "commit": "<sha>", "model": "<id>", "agent": "<id>", "at": "<iso>" } so commit messages
 // stay clean. Reads only local files + `git log`; no network. See ADR-0005.
 import { fs, path } from './util.js';
 import { readYaml } from './yaml.js';
+import { loadConfig, areaDir, provenancePath } from './config.js';
 import { execFileSync } from 'node:child_process';
 
+// Legacy default location, kept as a public constant for API stability. The live path is resolved
+// per-repo via provenancePath() so it tracks the governed root (`trellis/` or legacy `.trellis/`).
 export const PROVENANCE_FILE = '.trellis/provenance.jsonl';
-const POLICY_FILE = 'governance/model-policy.yaml';
 // Ids shipped by earlier templates ("your-primary-model"); never a real model, so never configuration.
 const PLACEHOLDER = /^your-[a-z0-9-]*model$/i;
 
 /**
- * Load governance/model-policy.yaml, or null when the repo declares no policy.
+ * Load the repo's model-policy (governance/model-policy.yaml), or null when none is declared.
  * `configured` is false until the policy names a real model; the check is then not evaluated.
  */
-export function loadModelPolicy(repoRoot) {
-  const file = path.join(repoRoot, POLICY_FILE);
+export function loadModelPolicy(repoRoot, config = loadConfig(repoRoot)) {
+  const file = areaDir(repoRoot, config, 'governance', 'model-policy.yaml');
   if (!fs.existsSync(file)) return null;
   const raw = readYaml(file) || {};
   const list = (v) => (Array.isArray(v) ? v : []).map(String).filter((m) => m.trim() && !PLACEHOLDER.test(m));
@@ -38,11 +41,15 @@ export function loadModelPolicy(repoRoot) {
   };
 }
 
-/** Read .trellis/provenance.jsonl into a Map<commitSha, record>. Last write wins; bad lines skip. */
-export function readProvenance(repoRoot) {
+/** Read the provenance log into a Map<commitSha, record>. Last write wins; bad lines skip. */
+export function readProvenance(repoRoot, config = loadConfig(repoRoot)) {
   const map = new Map();
-  const file = path.join(repoRoot, PROVENANCE_FILE);
-  if (!fs.existsSync(file)) return map;
+  let file = provenancePath(repoRoot, config);
+  if (!fs.existsSync(file)) {
+    const legacy = path.join(repoRoot, '.trellis', 'provenance.jsonl');
+    if (!fs.existsSync(legacy)) return map;
+    file = legacy; // read a pre-consolidation log if the repo still has one
+  }
   for (const line of fs.readFileSync(file, 'utf8').split('\n')) {
     const s = line.trim();
     if (!s) continue;
@@ -60,7 +67,7 @@ export function stampProvenance(repoRoot, { commit, model, agent, at } = {}) {
   const rec = { commit: String(commit), model: String(model) };
   if (agent) rec.agent = String(agent);
   rec.at = at || new Date().toISOString();
-  const file = path.join(repoRoot, PROVENANCE_FILE);
+  const file = provenancePath(repoRoot, loadConfig(repoRoot));
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.appendFileSync(file, JSON.stringify(rec) + '\n');
   return rec;
@@ -118,8 +125,9 @@ const notEvaluated = (reason, configured = false) => ({ evaluated: false, ok: nu
  */
 export function checkModelProvenance(repoRoot, { since } = {}) {
   repoRoot = path.resolve(repoRoot || process.cwd());
-  const policy = loadModelPolicy(repoRoot);
-  if (!policy) return notEvaluated('no governance/model-policy.yaml');
+  const config = loadConfig(repoRoot);
+  const policy = loadModelPolicy(repoRoot, config);
+  if (!policy) return notEvaluated('no model-policy.yaml');
   if (!policy.configured) return notEvaluated('model allow-list not configured (allowed_models is empty or holds only template placeholders)');
   if (!isGitRepo(repoRoot)) return notEvaluated('not a git repository', true);
   let commits;
@@ -128,6 +136,6 @@ export function checkModelProvenance(repoRoot, { since } = {}) {
   } catch (e) {
     return notEvaluated(`git rev-list failed: ${e.message}`, true);
   }
-  const { results, violations, ok } = classifyCommits(commits, readProvenance(repoRoot), policy);
+  const { results, violations, ok } = classifyCommits(commits, readProvenance(repoRoot, config), policy);
   return { evaluated: true, ok, configured: true, enforcement: policy.enforcement, policy, results, violations };
 }

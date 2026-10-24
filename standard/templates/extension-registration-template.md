@@ -23,7 +23,7 @@ When a new {{extension type}} is added under `{{root}}/`, ALL of the following m
 3. `{{config-schema}}` - add config fields; mark required/optional and secret fields
 4. `.env.example` - add required environment variables (no real secrets)
 5. `{{docs-path}}` - installation steps, usage example, limitations
-6. `capabilities/<affected>/contract.yaml` - add scenarios this extension affects
+6. `trellis/capabilities/<affected>/contract.yaml` - add scenarios this extension affects
 7. `test-cockpit/manifest.yaml` - register test scenarios *(when cockpit is enabled)*
 8. `CHANGELOG.md` - add the new extension
 
